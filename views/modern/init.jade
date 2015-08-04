@@ -1,0 +1,44 @@
+doctype html
+html(lang="en", ng-app="jumplink.cms", ng-controller="AppController", ng-init="$root.authenticated = #{authenticated}; $root.user = #{user}; $root.debug = false")
+  head
+    base(href="/")
+    title Nautischer Verein Cuxhaven
+    //- favicons generated with http://www.favicon-generator.org/
+    link(rel="apple-touch-icon" sizes="57x57" href="/assets/favicons/apple-icon-57x57.png")
+    link(rel="apple-touch-icon" sizes="60x60" href="/assets/favicons/apple-icon-60x60.png")
+    link(rel="apple-touch-icon" sizes="72x72" href="/assets/favicons/apple-icon-72x72.png")
+    link(rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png")
+    link(rel="apple-touch-icon" sizes="114x114" href="/assets/favicons/apple-icon-114x114.png")
+    link(rel="apple-touch-icon" sizes="120x120" href="/assets/favicons/apple-icon-120x120.png")
+    link(rel="apple-touch-icon" sizes="144x144" href="/assets/favicons/apple-icon-144x144.png")
+    link(rel="apple-touch-icon" sizes="152x152" href="/assets/favicons/apple-icon-152x152.png")
+    link(rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/apple-icon-180x180.png")
+    link(rel="icon" type="image/png" sizes="192x192"  href="/assets/favicons/android-icon-192x192.png")
+    link(rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32.png")
+    link(rel="icon" type="image/png" sizes="96x96" href="/assets/favicons/favicon-96x96.png")
+    link(rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16x16.png")
+    link(rel="manifest" href="/assets/favicons/manifest.json")
+    meta(name="msapplication-TileColor" content="#ffffff")
+    meta(name="msapplication-TileImage" content="/assets/favicons/ms-icon-144x144.png")
+    meta(name="theme-color" content="#ffffff")
+    //- Viewport mobile tag for sensible mobile support
+    meta(name="viewport",content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no")
+    if force != 'modern'
+      noscript
+        meta(http-equiv="refresh" content="0; url="+url+"?force=noscript")
+    //- Stylesheets
+    link(href='/assets/styles/app.css', rel='stylesheet')
+  body(ng-class="bodyclass")
+    include ./variables.jade
+    if force != 'modern'
+      noscript
+        div(style="padding: 40px 15px;text-align: center;")
+          h1 Sie haben JavaScript deaktivert.
+          a.btn.btn-primary.btn-lg(href="https://"+url+"?force=noscript") Kompatiblitätsmodus aktivieren
+    span(ui-view)
+    // SCRIPTS
+    if config.environment == 'development'
+      script(type="text/javascript", charset="utf-8", src="assets/js/app.concat.js")
+    else
+      script(type="text/javascript", charset="utf-8", src="assets/js/app.min.js")
+    // SCRIPTS END

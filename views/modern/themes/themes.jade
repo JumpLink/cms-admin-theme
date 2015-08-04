@@ -1,0 +1,15 @@
+.container
+  .page-header
+    h1 Themes
+  button(type="button" class="btn btn-default" ng-model="selectedSite" data-html="0" bs-options="site for site in sites", data-template-url="/views/modern/select.jade", bs-select) Site
+  .media(ng-repeat="theme in themeSettings.available | orderBy:priority")
+    .media-left
+      img.media-object(ng-src='{{theme.image}}?theme={{theme.dirname}}', alt='{{theme.image}}', style="width:200px;", width="200px")
+    .media-body
+      h4.media-heading {{theme.name}}
+      | {{theme.description}}
+    .media-right
+      .form-group(style="width:100px;")
+        label(for='exampleInputEmail1') Priorität
+        input.form-control(type='number', ng-model="theme.priority")
+adminbar(data-add="add", data-download="download", data-refresh="refresh", data-toogle-html="toogleHtml", data-save="save")

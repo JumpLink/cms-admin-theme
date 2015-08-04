@@ -1,0 +1,25 @@
+extends ../layout.jade
+block body
+  include ../toolbar.jade
+  .container-fluid(style="min-height: 400px;")
+    .row
+      .col-md-2.hidden-sm.hidden-xs
+        //- .bs-sidebar(hidden-print, role="complementary", data-offset-top="-50", bs-affix)
+        //-   ul.nav.bs-sidenav
+        //-     li(ng-repeat="nav in navs", data-target="{{'#'+nav.target}}", bs-scrollspy, data-offset="70")
+        //-       a(ng-click="goTo(nav.target)") {{nav.name}}
+      .col-md-10
+        h1.page-header#cms JumpLink CMS
+        p This website is running with JumpLink CMS.
+        dl.dl-horizontal
+          dt Web
+          dd: a(href="http://jumplink.eu") jumplink.eu
+          dt Version
+          dd v#{cmsInfo.version}
+          dt Technik &amp; Design
+          dd: a(href="mailto:pascal@jumplink.eu") Pascal Garber
+          dt Runtime
+          dd #{cmsInfo.runtime.title} #{cmsInfo.runtime.version}
+          dt License
+          dd #{cmsInfo.license}
+  include ../footer.jade

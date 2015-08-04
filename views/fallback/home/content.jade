@@ -1,0 +1,47 @@
+extends ../layout.jade
+block body
+  include ../toolbar.jade
+  #top(style="margin-top: -20px;width: 100%;")
+    img.img-responsive(src="/assets/images/header/slideshow.gif", width="100%")
+  .container-fluid(style="min-height: 400px;")
+    .row
+      //- Left Subnavigation visable on medium devices or larger
+      include ../subnavigation.jade
+      //- Main Content
+      .col-md-8
+        h1.page-header Startseite
+        //- Events visable on small devices or smaller
+        .hidden-lg.hidden-md
+          .panel.panel-primary(style="margin-top: 40px;")
+            .panel-heading
+              h3.panel-title.text-center Aktuelles
+            .panel-body
+              div!= news.content
+              if events.after.length <= 0
+                | Keine bevorstehenden Veranstaltungen
+            if events.after.length > 0
+              ul.list-group
+                each event in events.after
+                  li.list-group-item
+                    a(href= force != null ? '/fallback/events?force='+force+"\##{event.name}" : '/fallback/events\##{event.name}') #{event.title}
+                    small  am #{event.from.format("DD.MM.YY")} um #{event.from.format("HH:mm")} Uhr #{event.subtext}
+        each content in contents
+          h2.anchor-static-navbar(id="#{content.name}")
+          h2.page-header #{content.title}
+          div!= content.content
+      //- Events visable on medium devices or larger
+      .col-md-2.hidden-xs.hidden-sm
+        .panel.panel-primary(style="margin-top: 40px;")
+          .panel-heading
+            h3.panel-title.text-center Aktuelles
+          .panel-body
+            div!= news.content
+            if events.after.length <= 0
+              | Keine bevorstehenden Veranstaltungen
+          if events.after.length > 0
+            ul.list-group
+              each event in events.after
+                li.list-group-item
+                  a(href= force != null ? '/fallback/events?force='+force+"\##{event.name}" : '/fallback/events\##{event.name}') #{event.title}
+                  small  am #{event.from.format("DD.MM.YY")} um #{event.from.format("HH:mm")} Uhr #{event.subtext}
+  include ../footer.jade

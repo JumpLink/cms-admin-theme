@@ -1,0 +1,24 @@
+.container
+  .page-header
+    h1 Benutzer
+  table.table.table-hover(ng-if="users.length")
+    thead
+      tr
+        //- th {{ 'Farbe' }}
+        th {{ 'E-Mail' }}
+        th {{ 'Name' }}
+        th {{ 'Aktion' }}
+    tbody
+      tr(ng-repeat="user in users", ui-sref="layout.user({index: user.id})")
+        //- td {{user.color}}
+        td {{user.email}}
+        td {{user.name}}
+        td
+          .btn-group
+            button.btn.btn-danger.btn-xs(title="Benutzer löschen", ng-click="remove(user);$event.stopPropagation();")
+              i.fa.fa-trash
+            a.btn.btn-warning.btn-xs(title="Benutzer bearbeiten", ui-sref="layout.user({index: user.id})", ng-click="$event.stopPropagation();")
+              i.fa.fa-edit
+  a.btn.btn-success(title="Benutzer hinzufügen", ui-sref="layout.new-user")
+    i.fa.fa-plus
+adminbar(data-add="add", data-download="download", data-refresh="refresh", data-toogle-html="toogleHtml", data-save="save")

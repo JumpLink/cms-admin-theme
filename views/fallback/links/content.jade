@@ -1,0 +1,10 @@
+extends ../layout.jade
+block body
+  include ../toolbar.jade
+  .container-fluid(style="min-height: 400px;")
+    .row
+      .col-md-2.hidden-sm.hidden-xs
+      .col-md-10
+        h1.page-header#links Links
+        div!= links
+  include ../footer.jade
