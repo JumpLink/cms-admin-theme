@@ -1,4 +1,4 @@
-jumplink.cms.controller('ThemesController', function($rootScope, $scope, $log, ThemeService) {
+jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, ThemeService) {
   $scope.themeSettings = {};
 
   $rootScope.$watch('selectedHost', function(newValue, oldValue) {

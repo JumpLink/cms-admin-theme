@@ -1,6 +1,6 @@
 .container
   .page-header
-    h1 Themes
+    h1 Routes
   .media(ng-repeat="theme in themeSettings.available | orderBy:priority")
     .media-left
       img.media-object(ng-src='{{theme.image}}?theme={{theme.dirname}}', alt='{{theme.image}}', style="width:200px;", width="200px")
