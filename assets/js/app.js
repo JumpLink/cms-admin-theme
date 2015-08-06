@@ -38,6 +38,7 @@ jumplink.cms = angular.module('jumplink.cms', [
   , 'jumplink.cms.admin'
   , 'jumplink.cms.session'
   , 'jumplink.cms.multisite'
+  , 'jumplink.cms.routes'
 ]);
 
 jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvider, $provide, $logProvider) {

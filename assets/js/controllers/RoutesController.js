@@ -1,16 +1,21 @@
 jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, RoutesService) {
-  // $scope.themeSettings = {};
+  if(angular.isUndefined($scope.routes)) $scope.routes = [];
 
   $rootScope.$watch('selectedHost', function(newValue, oldValue) {
-    $log.debug("[ThemesController] selectedHost changed from",oldValue,"to",newValue);
+    $log.debug("[RoutesController] selectedHost changed from",oldValue,"to",newValue);
     if(angular.isDefined(newValue)) {
-
+      RoutesService.findByHost({host:newValue}, function(err, routes) {
+        if(err) $scope.routes = [];
+        else $scope.routes = routes;
+        $log.debug("[RoutesController] new routes",routes);
+      });
     }
   });
+
   
   $scope.save = function() {
     $log.debug('themeSettings', $scope.themeSettings);
-    RoutesService.updateOrCreateEachByHost($rootScope.selectedHost, $scope.themeSettings.available, function(data) {
+    RoutesService.updateOrCreateEachByHost($rootScope.selectedHost, $scope.routes, function(data) {
       // $scope.themeSettings = data;
       $log.debug(data);
     });
@@ -18,23 +23,21 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
 
 
   $scope.add = function() {
-    if($rootScope.authenticated) {
-      SubnavigationService.add($scope.navs, {page:page}, function(err, navs) {
-        if(err) $log.error("Error: On add navs!", err);
-        $log.debug("add navs done!", navs);
-      });
-    }
+    RoutesService.append($scope.routes, {}, function(err, routes) {
+      if(err) $log.error("Error: On add routes!", err);
+      $log.debug("[RoutesController.add] Add routes done!", routes);
+    });
   }
 
   $scope.moveForward = function(index, content) {
-    SortableService.moveForward(index, $scope.contents, function(err, contents) {
+    RoutesService.moveForward(index, $scope.contents, function(err, contents) {
       if(err) $log.error("Error: On move content forward!", err);
       else $scope.contents = contents;
     });
   }
 
   $scope.moveBackward = function(index, content) {
-    SortableService.moveBackward(index, $scope.contents, function(err, contents) {
+    RoutesService.moveBackward(index, $scope.contents, function(err, contents) {
       if(err) $log.error("Error: On move content backward!", err);
       else $scope.contents = contents;
     });

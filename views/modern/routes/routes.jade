@@ -1,14 +1,40 @@
 .container
-  .page-header
-    h1 Routes
-  .media(ng-repeat="theme in themeSettings.available | orderBy:priority")
-    .media-left
-      img.media-object(ng-src='{{theme.image}}?theme={{theme.dirname}}', alt='{{theme.image}}', style="width:200px;", width="200px")
-    .media-body
-      h4.media-heading {{theme.name}}
-      | {{theme.description}}
-    .media-right
-      .form-group(style="width:100px;")
-        label(for='exampleInputEmail1') Priorität
-        input.form-control(type='number', ng-model="theme.priority")
+  h1.page-header Routes
+  form(ng-repeat="route in routes")
+    h2 {{route.title}}
+    .form-group
+      label(for='{{$index}}-title')
+        |&nbsp;&nbsp;Title&nbsp;&nbsp;
+      input.form-control(id="{{$index}}-title", type='text', placeholder='title', ng-model="route.title")
+    .form-group
+      label(for='{{$index}}-id')
+        |&nbsp;&nbsp;ID&nbsp;&nbsp;
+      input.form-control(id="{{$index}}-id", type='number', disabled="1", placeholder=0, ng-model="route.id")
+    .form-group
+      label(for='{{$index}}-match')
+        |&nbsp;&nbsp;Match&nbsp;&nbsp;
+      input.form-control(id="{{$index}}-match", type='text', placeholder='match', ng-model="route.match")
+    label Fallback
+    .form-group
+      label(for='{{$index}}-fallback-url')
+        |&nbsp;&nbsp;Url&nbsp;&nbsp;
+      input.form-control(id="{{$index}}-fallback-url", type='text', placeholder='url', ng-model="route.fallback.url")
+    label State
+    .form-group
+      label(for='{{$index}}-state-name')
+        |&nbsp;&nbsp;Name&nbsp;&nbsp;
+      input.form-control(id="{{$index}}-state-name", type='text', placeholder='name', ng-model="route.state.name")
+    .form-group
+      label(for='{{$index}}-state-url')
+        |&nbsp;&nbsp;Url&nbsp;&nbsp;
+      input.form-control(id="{{$index}}-state-url", type='text', placeholder='url', ng-model="route.state.url")
+    .form-group
+      label(for='{{$index}}-state-views')
+        |&nbsp;&nbsp;Views&nbsp;&nbsp;
+      textarea.form-control(id="{{$index}}-state-views", rows="3", placeholder='views', ng-model="route.state.views")
+    .form-group
+      label(for='{{$index}}-state-resolve')
+        |&nbsp;&nbsp;Resolve&nbsp;&nbsp;
+      textarea.form-control(id="{{$index}}-state-resolve", rows="3", placeholder='resolve', ng-model="route.state.resolve")
+    hr
 adminbar(data-add="add", data-download="download", data-refresh="refresh", data-toogle-html="toogleHtml", data-save="save")
