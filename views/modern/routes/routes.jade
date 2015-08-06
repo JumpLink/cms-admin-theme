@@ -24,15 +24,19 @@
       label(for='{{$index}}-state-name')
         |&nbsp;&nbsp;Name&nbsp;&nbsp;
       input.form-control(id="{{$index}}-state-name", type='text', placeholder='name', ng-model="route.state.name")
-    .form-group
+    form-group
+      label(for='{{$index}}-customstate') Custom State
+      br
+      toggle-switch(id="{{$index}}-customstate", ng-model="route.customstate")
+    .form-group(ng-show="route.customstate")
       label(for='{{$index}}-state-url')
         |&nbsp;&nbsp;Url&nbsp;&nbsp;
       input.form-control(id="{{$index}}-state-url", type='text', placeholder='url', ng-model="route.state.url")
-    .form-group
+    .form-group(ng-show="route.customstate")
       label(for='{{$index}}-state-views')
         |&nbsp;&nbsp;Views&nbsp;&nbsp;
       textarea.form-control(id="{{$index}}-state-views", rows="3", placeholder='views', ng-model="route.state.views")
-    .form-group
+    .form-group(ng-show="route.customstate")
       label(for='{{$index}}-state-resolve')
         |&nbsp;&nbsp;Resolve&nbsp;&nbsp;
       textarea.form-control(id="{{$index}}-state-resolve", rows="3", placeholder='resolve', ng-model="route.state.resolve")

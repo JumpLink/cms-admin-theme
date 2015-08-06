@@ -1,4 +1,6 @@
 script.
   var environment = '#{config.environment}';
-  var user = '#{user}';
-  var authenticated = '#{authenticated}'
+  var user = !{JSON.stringify(user)};
+  var authenticated = '#{authenticated}';
+  var routes = eval(!{JSON.stringify(routes)});
+  console.log(routes);

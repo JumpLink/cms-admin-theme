@@ -77,9 +77,8 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
 
   $urlRouterProvider.otherwise('/home');
 
-  $stateProvider
   // LAYOUT
-  .state('layout', {
+  $stateProvider.state('layout', {
     abstract: true,
     templateUrl: '/views/modern/layout.jade',
     controller: 'LayoutController',
@@ -92,8 +91,40 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
         return MultisiteService.resolveHosts({});
       },
     },
-  })
-  .state('layout.home', {
+  });
+
+  // load optional addional states
+  for (var i = 0; i < routes.length; i++) {
+    
+    console.log("[Routes] route", i, routes[i]);
+
+    if(routes[i].customstate === true) {
+
+      var options = {};
+    
+      if(typeof(routes[i].state.url) === 'string' && routes[i].state.url.length > 0) options.url = routes[i].state.url;
+      // if(angular.isDefined(routes[i].state.resolve)) options.resolve = eval(routes[i].state.resolve);
+      
+      // TODO Dirty hack!
+      if(angular.isDefined(routes[i].state.resolve) && typeof(routes[i].state.resolve) === 'string' && routes[i].state.resolve.length > 0) {
+        eval(routes[i].state.resolve);
+        options.resolve = resolve;
+      }
+
+      // TODO Dirty hack!
+      if(angular.isDefined(routes[i].state.views) && typeof(routes[i].state.views) === 'string' && routes[i].state.views.length > 0) {
+        eval(routes[i].state.views);
+        options.views = view;
+      }
+
+      console.log("[Routes] state options", options);
+
+      $stateProvider.state(routes[i].state.name, options);
+    }
+  };
+
+
+  $stateProvider.state('layout.home', {
     url: '/home',
     resolve: {
       
@@ -108,8 +139,8 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
         , controller: 'ToolbarController'
       }
     }
-  })
-  .state('layout.themes', {
+  });
+  $stateProvider.state('layout.themes', {
     url: '/themes',
     views: {
       'content' : {
@@ -121,8 +152,8 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
         , controller: 'ToolbarController'
       },
     }
-  })
-  .state('layout.routes', {
+  });
+  $stateProvider.state('layout.routes', {
     url: '/routes',
     views: {
       'content' : {
@@ -134,8 +165,10 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
         , controller: 'ToolbarController'
       },
     }
-  })
-  .state('layout.users', {
+  });
+
+
+  $stateProvider.state('layout.users', {
     url: '/users'
     , resolve: {
       authenticated: authenticated,
@@ -157,8 +190,8 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
         , controller: 'ToolbarController'
       }
     }
-  })
-  .state('layout.user', {
+  });
+  $stateProvider.state('layout.user', {
     url: '/user/:index'
     , resolve: {
       authenticated: authenticated,
@@ -181,8 +214,8 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
         , controller: 'ToolbarController'
       }
     }
-  })
-  .state('layout.new-user', {
+  });
+  $stateProvider.state('layout.new-user', {
     url: '/new/user'
     , resolve: {
       authenticated: authenticated,
@@ -232,14 +265,14 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
   .state('error', {
     abstract: true,
     templateUrl: '/views/modern/layout.jade',
-    controller: 'ErrorController',
-  })
-  .state('error.signin', {
+    // controller: 'ErrorController',
+  });
+  $stateProvider.state('error.signin', {
     url: '/error/:error'
     , views: {
       'content' : {
-        templateUrl: '/views/modern/error/error.jade'
-        // , controller: 'ErrorController'
+        templateUrl: '/views/modern/error/error.jade',
+        controller: 'ErrorController'
       }
       , 'toolbar' : {
         templateUrl: '/views/modern/toolbar.jade'
