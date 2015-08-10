@@ -40,6 +40,7 @@ jumplink.cms = angular.module('jumplink.cms', [
   , 'jumplink.cms.multisite'
   , 'jumplink.cms.routes'
   , 'jumplink.cms.sidebar'
+  , 'jumplink.cms.toolbar'
 ]);
 
 jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvider, $provide, $logProvider) {
@@ -101,8 +102,8 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
     },
     views: {
       'content' : {
-        templateUrl: '/views/modern/home/home.jade'
-        , controller: 'HomeController'
+        templateUrl: '/views/modern/home/home.jade',
+        controller: 'HomeController'
       },
       'toolbar' : {
         resolve: {
@@ -110,8 +111,8 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        templateUrl: '/views/modern/toolbar.jade'
-        , controller: 'ToolbarController'
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
+        controller: 'ToolbarController'
       },
     }
   });
@@ -129,7 +130,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        templateUrl: '/views/modern/toolbar.jade',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -148,7 +149,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        templateUrl: '/views/modern/toolbar.jade',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -177,7 +178,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        templateUrl: '/views/modern/toolbar.jade',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -207,7 +208,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        templateUrl: '/views/modern/toolbar.jade',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -234,7 +235,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        templateUrl: '/views/modern/toolbar.jade',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -261,7 +262,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        templateUrl: '/views/modern/toolbar.jade',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
         controller: 'ToolbarController'
       },
       'footer' : {
@@ -291,7 +292,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        templateUrl: '/views/modern/toolbar.jade',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
         controller: 'ToolbarController'
       },
       'footer' : {
@@ -307,7 +308,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
    */
   for (var i = 0; i < routes.length; i++) {
     
-    console.log("[Routes] route", i, routes[i]);
+    // console.log("[Routes] route", i, routes[i]);
 
     if(routes[i].customstate === true) {
 
@@ -328,7 +329,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
         options.views = view;
       }
 
-      console.log("[Routes] state options", options);
+      // console.log("[Routes] state options", options);
 
       $stateProvider.state(routes[i].state.name, options);
     }

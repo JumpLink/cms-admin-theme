@@ -2,12 +2,12 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
   if(angular.isUndefined($scope.routes)) $scope.routes = [];
 
   $rootScope.$watch('selectedHost', function(newValue, oldValue) {
-    $log.debug("[RoutesController] selectedHost changed from",oldValue,"to",newValue);
+    // $log.debug("[RoutesController] selectedHost changed from",oldValue,"to",newValue);
     if(angular.isDefined(newValue)) {
       RoutesService.findByHost({host:newValue}, function(err, routes) {
         if(err) $scope.routes = [];
         else $scope.routes = routes;
-        $log.debug("[RoutesController] new routes",routes);
+        // $log.debug("[RoutesController] new routes",routes);
       });
     }
   });
@@ -17,7 +17,7 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
     $log.debug('themeSettings', $scope.themeSettings);
     RoutesService.updateOrCreateEachByHost($rootScope.selectedHost, $scope.routes, function(data) {
       // $scope.themeSettings = data;
-      $log.debug(data);
+      // $log.debug(data);
     });
   }
 
