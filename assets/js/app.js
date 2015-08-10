@@ -1,7 +1,3 @@
-if (typeof jumplink === 'undefined') {
-  var jumplink = {};
-}
-
 jumplink.cms = angular.module('jumplink.cms', [
   'ui.router'                 // AngularUI Router: https://github.com/angular-ui/ui-router
   , 'ngAnimate'               // ngAnimate: https://docs.angularjs.org/api/ngAnimate
@@ -272,7 +268,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
     }
   });
 
-  // LAYOUT
+  // ERROR LAYOUT
   $stateProvider.state('error', {
     abstract: true,
     templateUrl: '/views/modern/layout.jade',

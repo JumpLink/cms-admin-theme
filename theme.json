@@ -12,7 +12,7 @@
   "setup": {
     "users": [
       {
-        "email":"admin@admin.org",
+        "email": "admin@admin.org",
         "name": "admin",
         "color": "#000000",
         "password": "cms-admin",
