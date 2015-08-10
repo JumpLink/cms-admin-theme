@@ -39,6 +39,7 @@ jumplink.cms = angular.module('jumplink.cms', [
   , 'jumplink.cms.session'
   , 'jumplink.cms.multisite'
   , 'jumplink.cms.routes'
+  , 'jumplink.cms.sidebar'
 ]);
 
 jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvider, $provide, $logProvider) {
@@ -89,11 +90,221 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
       },
       hosts: function(MultisiteService) {
         return MultisiteService.resolveHosts({});
-      },
+      }
     },
   });
 
-  // load optional addional states
+  $stateProvider.state('layout.home', {
+    url: '/home',
+    resolve: {
+      
+    },
+    views: {
+      'content' : {
+        templateUrl: '/views/modern/home/home.jade'
+        , controller: 'HomeController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        templateUrl: '/views/modern/toolbar.jade'
+        , controller: 'ToolbarController'
+      },
+    }
+  });
+
+  $stateProvider.state('layout.themes', {
+    url: '/themes',
+    views: {
+      'content' : {
+        templateUrl: '/views/modern/themes/themes.jade',
+        controller: 'ThemesController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        templateUrl: '/views/modern/toolbar.jade',
+        controller: 'ToolbarController'
+      },
+    }
+  });
+
+  $stateProvider.state('layout.routes', {
+    url: '/routes',
+    views: {
+      'content' : {
+        templateUrl: '/views/modern/routes/routes.jade',
+        controller: 'RoutesController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        templateUrl: '/views/modern/toolbar.jade',
+        controller: 'ToolbarController'
+      },
+    }
+  });
+
+  $stateProvider.state('layout.users', {
+    url: '/users'
+    , resolve: {
+      authenticated: authenticated,
+      users: function($sailsSocket, $log) {
+        return $sailsSocket.get('/user').then (function (data) {
+          return data.data;
+        }, function error (resp){
+          $log.error(resp);
+        });
+      }
+    }
+    , views: {
+      'content' : {
+        templateUrl: '/views/modern/user/users.jade'
+        , controller: 'UsersController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        templateUrl: '/views/modern/toolbar.jade',
+        controller: 'ToolbarController'
+      },
+    }
+  });
+
+  $stateProvider.state('layout.user', {
+    url: '/user/:index'
+    , resolve: {
+      authenticated: authenticated,
+      user: function($sailsSocket, $stateParams, $log) {
+        return $sailsSocket.get('/user'+'/'+$stateParams.index).then (function (data) {
+          delete data.data.password;
+          return data.data;
+        }, function error (resp){
+          $log.error(resp);
+        });
+      }
+    }
+    , views: {
+      'content' : {
+        templateUrl: '/views/modern/user/user.jade'
+        , controller: 'UserController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        templateUrl: '/views/modern/toolbar.jade',
+        controller: 'ToolbarController'
+      },
+    }
+  });
+
+  $stateProvider.state('layout.new-user', {
+    url: '/new/user'
+    , resolve: {
+      authenticated: authenticated,
+      user: function() {
+        return {
+
+        };
+      }
+    }
+    , views: {
+      'content' : {
+        templateUrl: '/views/modern/user/user.jade'
+        , controller: 'UserController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        templateUrl: '/views/modern/toolbar.jade',
+        controller: 'ToolbarController'
+      },
+    }
+  })
+
+  // cms
+  $stateProvider.state('layout.cms', {
+    url: '/cms'
+    , resolve: {
+      authenticated: authenticated,
+      info: function(CmsService, $log) {
+        $log.debug("start get cms info");
+        return CmsService.infoUser();
+      },
+    }
+    , views: {
+      'content' : {
+        templateUrl: '/views/modern/cms/content.jade'
+        , controller: 'CmsController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        templateUrl: '/views/modern/toolbar.jade',
+        controller: 'ToolbarController'
+      },
+      'footer' : {
+        templateUrl: '/views/modern/footer.jade',
+        controller: 'FooterController'
+      }
+    }
+  });
+
+  // LAYOUT
+  $stateProvider.state('error', {
+    abstract: true,
+    templateUrl: '/views/modern/layout.jade',
+    // controller: 'ErrorController',
+  });
+
+  $stateProvider.state('error.signin', {
+    url: '/error/:error'
+    , views: {
+      'content' : {
+        templateUrl: '/views/modern/error/error.jade',
+        controller: 'ErrorController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        templateUrl: '/views/modern/toolbar.jade',
+        controller: 'ToolbarController'
+      },
+      'footer' : {
+        templateUrl: '/views/modern/footer.jade',
+        controller: 'FooterController'
+      }
+    }
+  });
+
+  /**
+   * Load optional addional states.
+   * WARNING: Very experimental and dangerous.
+   */
   for (var i = 0; i < routes.length; i++) {
     
     console.log("[Routes] route", i, routes[i]);
@@ -123,167 +334,6 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
     }
   };
 
-
-  $stateProvider.state('layout.home', {
-    url: '/home',
-    resolve: {
-      
-    },
-    views: {
-      'content' : {
-        templateUrl: '/views/modern/home/home.jade'
-        , controller: 'HomeController'
-      }
-      , 'toolbar' : {
-        templateUrl: '/views/modern/toolbar.jade'
-        , controller: 'ToolbarController'
-      }
-    }
-  });
-  $stateProvider.state('layout.themes', {
-    url: '/themes',
-    views: {
-      'content' : {
-        templateUrl: '/views/modern/themes/themes.jade'
-        , controller: 'ThemesController'
-      },
-      'toolbar' : {
-        templateUrl: '/views/modern/toolbar.jade'
-        , controller: 'ToolbarController'
-      },
-    }
-  });
-  $stateProvider.state('layout.routes', {
-    url: '/routes',
-    views: {
-      'content' : {
-        templateUrl: '/views/modern/routes/routes.jade'
-        , controller: 'RoutesController'
-      },
-      'toolbar' : {
-        templateUrl: '/views/modern/toolbar.jade'
-        , controller: 'ToolbarController'
-      },
-    }
-  });
-
-
-  $stateProvider.state('layout.users', {
-    url: '/users'
-    , resolve: {
-      authenticated: authenticated,
-      users: function($sailsSocket, $log) {
-        return $sailsSocket.get('/user').then (function (data) {
-          return data.data;
-        }, function error (resp){
-          $log.error(resp);
-        });
-      }
-    }
-    , views: {
-      'content' : {
-        templateUrl: '/views/modern/user/users.jade'
-        , controller: 'UsersController'
-      }
-      , 'toolbar' : {
-        templateUrl: '/views/modern/toolbar.jade'
-        , controller: 'ToolbarController'
-      }
-    }
-  });
-  $stateProvider.state('layout.user', {
-    url: '/user/:index'
-    , resolve: {
-      authenticated: authenticated,
-      user: function($sailsSocket, $stateParams, $log) {
-        return $sailsSocket.get('/user'+'/'+$stateParams.index).then (function (data) {
-          delete data.data.password;
-          return data.data;
-        }, function error (resp){
-          $log.error(resp);
-        });
-      }
-    }
-    , views: {
-      'content' : {
-        templateUrl: '/views/modern/user/user.jade'
-        , controller: 'UserController'
-      }
-      , 'toolbar' : {
-        templateUrl: '/views/modern/toolbar.jade'
-        , controller: 'ToolbarController'
-      }
-    }
-  });
-  $stateProvider.state('layout.new-user', {
-    url: '/new/user'
-    , resolve: {
-      authenticated: authenticated,
-      user: function() {
-        return {
-
-        };
-      }
-    }
-    , views: {
-      'content' : {
-        templateUrl: '/views/modern/user/user.jade'
-        , controller: 'UserController'
-      }
-      , 'toolbar' : {
-        templateUrl: '/views/modern/toolbar.jade'
-        , controller: 'ToolbarController'
-      }
-    }
-  })
-  // cms
-  .state('layout.cms', {
-    url: '/cms'
-    , resolve: {
-      authenticated: authenticated,
-      info: function(CmsService, $log) {
-        $log.debug("start get cms info");
-        return CmsService.infoUser();
-      },
-    }
-    , views: {
-      'content' : {
-        templateUrl: '/views/modern/cms/content.jade'
-        , controller: 'CmsController'
-      }
-      , 'toolbar' : {
-        templateUrl: '/views/modern/toolbar.jade'
-        , controller: 'ToolbarController'
-      }
-      , 'footer' : {
-        templateUrl: '/views/modern/footer.jade'
-        , controller: 'FooterController'
-      }
-    }
-  })
-  // LAYOUT
-  .state('error', {
-    abstract: true,
-    templateUrl: '/views/modern/layout.jade',
-    // controller: 'ErrorController',
-  });
-  $stateProvider.state('error.signin', {
-    url: '/error/:error'
-    , views: {
-      'content' : {
-        templateUrl: '/views/modern/error/error.jade',
-        controller: 'ErrorController'
-      }
-      , 'toolbar' : {
-        templateUrl: '/views/modern/toolbar.jade'
-        , controller: 'ToolbarController'
-      }
-      , 'footer' : {
-        templateUrl: '/views/modern/footer.jade'
-        , controller: 'FooterController'
-      }
-    }
-  })
 })
 .run(function ($rootScope, $state, $window, $log) {
   $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
