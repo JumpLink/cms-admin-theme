@@ -44,32 +44,6 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
   // see init.jade environment variable
   $logProvider.debugEnabled(environment === 'development');
 
-  // Used for routes you can only visit if you are signed in, throws an error message if your are not authenticated
-  var authenticated = ['$q', '$sailsSocket', function ($q, $sailsSocket) {
-    console.log("authenticated");
-    var deferred = $q.defer();
-    $sailsSocket.get('/session/authenticated').then (function (data) {
-      if (data.data) {
-        console.log("is authenticated", data);
-        return deferred.resolve(data.data);
-      } else {
-        console.log("is not authenticated", data);
-        return deferred.reject('Not logged in');
-      }
-    });
-    return deferred.promise;
-  }];
-
-  // Used if you need authentication conditions
-  var isauthenticated = function ($q, $sailsSocket) {
-    console.log("authenticated");
-    var deferred = $q.defer();
-    return $sailsSocket.get('/session/authenticated').then (function (data) {
-      return data.data;
-    });
-    return deferred.promise;
-  };
-
   // use the HTML5 History API
   $locationProvider.html5Mode(false);
 
@@ -81,7 +55,9 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
     templateUrl: '/views/modern/layout.jade',
     controller: 'LayoutController',
     resolve: {
-      authenticated: authenticated,
+      authenticated: function (SessionService) {
+        return SessionService.authenticated();
+      },
       sites: function(MultisiteService) {
         return MultisiteService.resolveNames({});
       },
@@ -107,7 +83,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -126,7 +102,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -145,7 +121,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -154,7 +130,9 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
   $stateProvider.state('layout.users', {
     url: '/users'
     , resolve: {
-      authenticated: authenticated,
+      authenticated: function (SessionService) {
+        return SessionService.authenticated();
+      },
       users: function($sailsSocket, $log) {
         return $sailsSocket.get('/user').then (function (data) {
           return data.data;
@@ -174,7 +152,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -183,7 +161,9 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
   $stateProvider.state('layout.user', {
     url: '/user/:index'
     , resolve: {
-      authenticated: authenticated,
+      authenticated: function (SessionService) {
+        return SessionService.authenticated();
+      },
       user: function($sailsSocket, $stateParams, $log) {
         return $sailsSocket.get('/user'+'/'+$stateParams.index).then (function (data) {
           delete data.data.password;
@@ -204,7 +184,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -213,7 +193,9 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
   $stateProvider.state('layout.new-user', {
     url: '/new/user'
     , resolve: {
-      authenticated: authenticated,
+      authenticated: function (SessionService) {
+        return SessionService.authenticated();
+      },
       user: function() {
         return {
 
@@ -231,7 +213,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -241,7 +223,9 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
   $stateProvider.state('layout.cms', {
     url: '/cms'
     , resolve: {
-      authenticated: authenticated,
+      authenticated: function (SessionService) {
+        return SessionService.authenticated();
+      },
       info: function(CmsService, $log) {
         $log.debug("start get cms info");
         return CmsService.infoUser();
@@ -258,7 +242,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
         controller: 'ToolbarController'
       },
       'footer' : {
@@ -288,7 +272,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle"></jltoolbar>',
+        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
         controller: 'ToolbarController'
       },
       'footer' : {
@@ -330,11 +314,10 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
       $stateProvider.state(routes[i].state.name, options);
     }
   };
+});
 
-})
-.run(function ($rootScope, $state, $window, $log) {
+jumplink.cms.run(function ($rootScope, $state, $window, $log) {
   $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
     $state.go('error.signin', {error: error});
   });
-})
-;
+});
