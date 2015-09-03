@@ -24,6 +24,7 @@
         "position": 1,
         "match": "/*home*",
         "title": "Home",
+        "url": "/home",
         "state": {
           "name": "layout.home",
           "customstate": false,
@@ -39,6 +40,7 @@
         "position": 2,
         "match": "/*themes*",
         "title": "Themes",
+        "url": "/themes",
         "state": {
           "name": "layout.themes",
           "customstate": false,
@@ -54,6 +56,7 @@
         "position": 3,
         "match": "/*routes*",
         "title": "Routes",
+        "url": "/routes",
         "state": {
           "name": "layout.routes",
           "customstate": false,

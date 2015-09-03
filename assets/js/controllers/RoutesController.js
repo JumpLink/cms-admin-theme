@@ -12,35 +12,53 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
     }
   });
 
-  
   $scope.save = function() {
-    $log.debug('themeSettings', $scope.themeSettings);
-    RoutesService.updateOrCreateEachByHost($rootScope.selectedHost, $scope.routes, function(data) {
-      // $scope.themeSettings = data;
-      // $log.debug(data);
+    RoutesService.saveEachByHost($rootScope.selectedHost, $scope.routes, function(result) {
+      $log.debug('[RouteController.save] result', result);
+    });
+  };
+
+  $scope.destroy = function(index, route) {
+    $log.debug('[RouteController.destroy] route', route);
+    RoutesService.destroy($scope.routes, index, route, function(result) {
+      $log.debug('[RouteController.destroy] result', result);
     });
   }
-
 
   $scope.add = function() {
     RoutesService.append($scope.routes, {}, function(err, routes) {
       if(err) $log.error("Error: On add routes!", err);
       $log.debug("[RoutesController.add] Add routes done!", routes);
     });
-  }
+  };
 
-  $scope.moveForward = function(index, content) {
-    RoutesService.moveForward(index, $scope.contents, function(err, contents) {
-      if(err) $log.error("Error: On move content forward!", err);
-      else $scope.contents = contents;
-    });
-  }
+  $scope.addAlternativeUrl = function($index, route) {
+    $log.debug("[RoutesController.addAlternativeUrl]", $index, route);
+    if(angular.isUndefined(route.alternativeUrls) || !angular.isArray(route.alternativeUrls)) route.alternativeUrls = [""];
+    else route.alternativeUrls.push("");
+  };
 
-  $scope.moveBackward = function(index, content) {
-    RoutesService.moveBackward(index, $scope.contents, function(err, contents) {
-      if(err) $log.error("Error: On move content backward!", err);
-      else $scope.contents = contents;
+  $scope.removeAlternativeUrl = function($index, route) {
+    $log.debug("[RoutesController.removeAlternativeUrl]", $index, route);
+    if(route.alternativeUrls.length >= 1) route.alternativeUrls.pop();
+  };
+
+  $scope.edit = function($index, route) {
+    $log.debug("[RoutesController.edit] TODO!", $index, route);
+  };
+
+  $scope.moveForward = function(index, route) {
+    RoutesService.moveForward(index, $scope.routes, function(err, routes) {
+      if(err) $log.error("Error: On move route forward!", err);
+      else $scope.routes = routes;
     });
-  } 
+  };
+
+  $scope.moveBackward = function(index, route) {
+    RoutesService.moveBackward(index, $scope.routes, function(err, routes) {
+      if(err) $log.error("Error: On move route backward!", err);
+      else $scope.routes = routes;
+    });
+  };
 
 });
