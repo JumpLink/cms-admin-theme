@@ -1,77 +1,108 @@
-.container
-  h1.page-header Routes
-  form(ng-repeat="route in routes | orderBy: 'position'")
-    h2 {{route.title}}
-    .form-group
-      label(for='{{$index}}-title')
-        |&nbsp;&nbsp;Title&nbsp;&nbsp;
-      input.form-control(id="{{$index}}-title", type='text', placeholder='title', ng-model="route.title")
-    .form-group
-      label(for='{{$index}}-id')
-        |&nbsp;&nbsp;ID&nbsp;&nbsp;
-      input.form-control(id="{{$index}}-id", type='number', disabled="1", placeholder=0, ng-model="route.id")
-    .form-group
-      label(for='{{$index}}-sitetitle')
-        |&nbsp;&nbsp;Sitetitle&nbsp;&nbsp;
-      input.form-control(id="{{$index}}-sitetitle", type='text', placeholder='sitetitle', ng-model="route.sitetitle")
-    .form-group
-      label(for='{{$index}}-navbar')
-        |&nbsp;&nbsp;Navbar&nbsp;&nbsp;
-      input.form-control(id="{{$index}}-navbar", type='text', placeholder='navbar', ng-model="route.navbar")
-    .form-group
-      label(for='{{$index}}-url')
-        |&nbsp;&nbsp;URL&nbsp;&nbsp;
-      input.form-control(id="{{$index}}-url", type='text', placeholder='url', ng-model="route.url")
-    .form-group
-      label(for='{{$index}}-url')
-        |&nbsp;&nbsp;Alternative URL's&nbsp;&nbsp;
-      input.form-control(ng-repeat="url in route.alternativeUrls", type='text', placeholder='urls', ng-model="url")
-      br
-      p.btn-group
-        button.btn.btn-warning(ng-click="addAlternativeUrl($index, route)"): i.fa.fa-plus
-        button.btn.btn-danger(ng-click="removeAlternativeUrl($index, route)"): i.fa.fa-minus
-    .form-group
-      label(for='{{$index}}-click')
-        |&nbsp;&nbsp;Click&nbsp;&nbsp;
-      input.form-control(id="{{$index}}-click", type='text', placeholder='click', ng-model="route.click")
-    .form-group
-      label(for='{{$index}}-match')
-        |&nbsp;&nbsp;Match&nbsp;&nbsp;
-      input.form-control(id="{{$index}}-match", type='text', placeholder='match', ng-model="route.match")
-    label Fallback
-    .form-group
-      label(for='{{$index}}-fallback-url')
-        |&nbsp;&nbsp;Url&nbsp;&nbsp;
-      input.form-control(id="{{$index}}-fallback-url", type='text', placeholder='url', ng-model="route.fallback.url")
-    label State
-    .form-group
-      label(for='{{$index}}-state-name')
-        |&nbsp;&nbsp;Name&nbsp;&nbsp;
-      input.form-control(id="{{$index}}-state-name", type='text', placeholder='name', ng-model="route.state.name")
-    form-group
-      label(for='{{$index}}-customstate') Custom State
-      br
-      toggle-switch(id="{{$index}}-customstate", ng-model="route.customstate")
-    .form-group(ng-show="route.customstate")
-      label(for='{{$index}}-state-url')
-        |&nbsp;&nbsp;Url&nbsp;&nbsp;
-      input.form-control(id="{{$index}}-state-url", type='text', placeholder='url', ng-model="route.state.url")
-    .form-group(ng-show="route.customstate")
-      label(for='{{$index}}-state-views')
-        |&nbsp;&nbsp;Views&nbsp;&nbsp;
-      textarea.form-control(id="{{$index}}-state-views", rows="3", placeholder='views', ng-model="route.state.views")
-    p.form-group(ng-show="route.customstate")
-      label(for='{{$index}}-state-resolve')
-        |&nbsp;&nbsp;Resolve&nbsp;&nbsp;
-      textarea.form-control(id="{{$index}}-state-resolve", rows="3", placeholder='resolve', ng-model="route.state.resolve")
-    br
-    label Actions
-    br
-    p.btn-group
-      button.btn.btn-warning(type="button", ng-disabled="$index <= 0", ng-click="moveBackward($index, route)"): i.fa.fa-backward
-      button.btn.btn-danger(type="button", ng-click="destroy($index, route)"): i.fa.fa-trash
-      button.btn.btn-warning(type="button", ng-click="edit($index, rout)"): i.fa.fa-edit
-      button.btn.btn-primary(type="button", ng-click="save($index, route)"): i.fa.fa-floppy-o
-      button.btn.btn-warning(type="button", ng-disabled="$index >= routes.length - 1", ng-click="moveForward($index, route)"): i.fa.fa-forward
-    hr
+.container-fluid
+  .row
+    .col-md-2.hidden-sm.hidden-xs
+      .bs-sidebar(hidden-print, role="complementary", data-offset-top="-50", bs-affix)
+        ul.nav.bs-sidenav
+          li(ng-repeat="route in routes | showOnlyMainRoutes:showMainRoutes track by $index  | orderBy: 'navbar' | orderBy: 'position'", data-target="{{'#'+route.objectName}}", bs-scrollspy, data-offset="70")
+            a(ng-click="goToHashPosition(route.objectName)") {{route.title}}
+    .col-md-10
+      h1.page-header Routes
+      h2.page-header Filter
+      p.form-group
+        label(for="mainRoutes")
+          | Show only main routes
+          br
+          toggle-switch(id="mainRoutes", ng-model="showMainRoutes")
+      h2.page-header Settings
+      form(ng-repeat="route in routes | showOnlyMainRoutes:showMainRoutes track by $index  | orderBy: 'navbar' | orderBy: 'position'")
+        h2(id="{{route.objectName}}") {{route.title}}
+        .form-group
+          label(for='{{$index}}-title')
+            | Title&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-title", type='text', placeholder='title', ng-model="route.title")
+        .form-group
+          label(for='{{$index}}-customstate') Main Route
+          br
+          toggle-switch(id="{{$index}}-main", ng-model="route.main")
+        .form-group
+          label(for='{{$index}}-id')
+            | ID&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-id", type='number', disabled="1", placeholder=0, ng-model="route.id")
+        .form-group
+          label(for='{{$index}}-key')
+            | Key&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-key", type='text', placeholder="key", ng-model="route.key")
+        .form-group
+          label(for='{{$index}}-sitetitle')
+            | Sitetitle&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-sitetitle", type='text', placeholder='sitetitle', ng-model="route.sitetitle")
+        .form-group
+          label(for='{{$index}}-navbar')
+            | Navbar&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-navbar", type='text', placeholder='navbar', ng-model="route.navbar")
+        .form-group
+          label(for='{{$index}}-url')
+            | URL&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-url", type='text', placeholder='url', ng-model="route.url")
+        .form-group(ng-show="route.main")
+          label
+            | Alternative URL's&nbsp;&nbsp;
+          span(ng-repeat="alternativeUrl in route.alternativeUrls track by $index")
+            input.form-control(type='text', placeholder='urls', ng-model="route.alternativeUrls[$index]")
+          br
+          p.btn-group
+            button.btn.btn-warning(ng-click="addAlternativeUrl($index, route)"): i.fa.fa-plus
+            button.btn.btn-danger(ng-click="removeAlternativeUrl($index, route)"): i.fa.fa-minus
+        .form-group
+          label(for='{{$index}}-click')
+            | Click&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-click", type='text', placeholder='click', ng-model="route.click")
+        .form-group
+          label(for='{{$index}}-match')
+            | Match&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-match", type='text', placeholder='match', ng-model="route.match")
+        .form-group(ng-show="route.main")
+          label(for='{{$index}}-objectName')
+            | Object Name&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-object-name", type='text', disabled="1", placeholder='objectName', ng-model="route.objectName")
+        //- label Fallback
+        //- .form-group
+        //-   label(for='{{$index}}-fallback-url')
+        //-     | &nbsp;&nbsp;Url&nbsp;&nbsp;
+        //-   input.form-control(id="{{$index}}-fallback-url", type='text', placeholder='url', ng-model="route.fallback.url")
+        label State
+        .form-group
+          label(for='{{$index}}-state-parent')
+            | &nbsp;&nbsp;Parent&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-state-parent", type='text', placeholder='parent', ng-model="route.state.parent")
+        .form-group
+          label(for='{{$index}}-state-name')
+            | &nbsp;&nbsp;Name&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-state-name", type='text', disabled="1", placeholder='name', ng-model="route.state.name")
+        .form-group(ng-show="route.main")
+          label(for='{{$index}}-customstate') Custom State
+          br
+          toggle-switch(id="{{$index}}-customstate", ng-model="route.customstate")
+        .form-group(ng-show="route.main && route.customstate")
+          label(for='{{$index}}-state-url')
+            | &nbsp;&nbsp;Url&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-state-url", type='text', placeholder='url', ng-model="route.state.url")
+        .form-group(ng-show="route.main && route.customstate")
+          label(for='{{$index}}-state-views')
+            | &nbsp;&nbsp;Views&nbsp;&nbsp;
+          textarea.form-control(id="{{$index}}-state-views", rows="3", placeholder='views', ng-model="route.state.views")
+        p.form-group(ng-show="route.main && route.customstate")
+          label(for='{{$index}}-state-resolve')
+            | &nbsp;&nbsp;Resolve&nbsp;&nbsp;
+          textarea.form-control(id="{{$index}}-state-resolve", rows="3", placeholder='resolve', ng-model="route.state.resolve")
+        br
+        label Actions
+        br
+        p.btn-group
+          button.btn.btn-warning(type="button", ng-disabled="$index <= 0", ng-click="moveBackward($index, route)"): i.fa.fa-backward
+          button.btn.btn-danger(type="button", ng-click="destroy($index, route)"): i.fa.fa-trash
+          button.btn.btn-warning(type="button", ng-click="edit($index, rout)"): i.fa.fa-edit
+          button.btn.btn-primary(type="button", ng-click="save($index, route)"): i.fa.fa-floppy-o
+          button.btn.btn-warning(type="button", ng-disabled="$index >= routes.length - 1", ng-click="moveForward($index, route)"): i.fa.fa-forward
+        hr
 adminbar(data-add="add", data-download="download", data-refresh="refresh", data-toogle-html="toogleHtml", data-save="save")
