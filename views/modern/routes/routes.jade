@@ -44,6 +44,14 @@
           label(for='{{$index}}-url')
             | URL&nbsp;&nbsp;
           input.form-control(id="{{$index}}-url", type='text', placeholder='url', ng-model="route.url")
+        .form-group
+          label(for='{{$index}}-hide')
+            | Hide&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-hide", type='text', placeholder='hide', ng-model="route.hide")
+        .form-group
+          label(for='{{$index}}-show')
+            | Show&nbsp;&nbsp;
+          input.form-control(id="{{$index}}-show", type='text', placeholder='show', ng-model="route.show")
         .form-group(ng-show="route.main")
           label
             | Alternative URL's&nbsp;&nbsp;
