@@ -83,7 +83,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -102,7 +102,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -121,7 +121,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -152,7 +152,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -184,7 +184,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -213,7 +213,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
         controller: 'ToolbarController'
       },
     }
@@ -242,7 +242,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
         controller: 'ToolbarController'
       },
       'footer' : {
@@ -272,7 +272,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
             return RoutesService.find({});
           },
         },
-        template: '<jltoolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jltoolbar>',
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
         controller: 'ToolbarController'
       },
       'footer' : {
