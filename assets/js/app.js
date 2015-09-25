@@ -47,7 +47,7 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
   // use the HTML5 History API
   $locationProvider.html5Mode(false);
 
-  $urlRouterProvider.otherwise('/home');
+  $urlRouterProvider.otherwise('/error/Request not found!');
 
   // LAYOUT
   $stateProvider.state('layout', {
