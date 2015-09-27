@@ -1,25 +1,4 @@
-var fallback = function (req, res, next, forceParam, route) {
-  var url = req.path;
-  var page = null;
-  if(UtilityService.isDefined(route) && UtilityService.isDefined(route.state) && UtilityService.isDefined(route.state.name)) page = route.state.name;
-  switch(req.path) {
-    case "/signin":
-      return signin(req, res, next, forceParam, showLegacyToast = true, page, route);
-    default:
-      return updateBrowser(req, res, next, forceParam, showLegacyToast = true, page, route);
-  }
-};
-
-/*
- * fallback html page to allow browser to auto-fill e-mail and password
- */
-var signin = function(req, res, next, force, showLegacyToast, page, route) {
-  var host = req.session.uri.host;
-  var flash = req.session.flash;
-  return ThemeService.view(host, 'views/fallback/signin.jade', res,  { showLegacyToast: false, flash: flash });
-}
-
-var updateBrowser = function (req, res, next, force, showLegacyToast, page, route) {
+var browser = function (req, res, next, force, showLegacyToast, page, route) {
   var routes = null;
 
   var host = req.session.uri.host;
@@ -59,9 +38,14 @@ var updateBrowser = function (req, res, next, force, showLegacyToast, page, rout
   });
 };
 
-module.exports = {
-  updateBrowser: updateBrowser
-  , fallback: fallback
-  , signin: signin
-};
+exports.layoutBackend = browser;
+exports.layoutStart = browser;
 
+/*
+ * fallback html page to allow browser to auto-fill e-mail and password
+ */
+exports.errorSignin = function(req, res, next, force, showLegacyToast, page, route) {
+  var host = req.session.uri.host;
+  var flash = req.session.flash;
+  return ThemeService.view(host, 'views/fallback/signin.jade', res,  { showLegacyToast: false, flash: flash });
+}

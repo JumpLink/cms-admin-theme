@@ -23,21 +23,55 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
     }
   });
 
+  var appendToStatename = function (statename, toAppend) {
+    $log.debug("[RoutesController.appendToStatename]", statename, toAppend);
+    if(angular.isString(toAppend) && toAppend.length > 0) {
+      if(angular.isString(statename) && statename.length > 0) {
+        statename += "."+toAppend.toLowerCase();
+      } else {
+        statename = toAppend.toLowerCase();
+      }
+    }
+    return statename;
+  }
+
+  var generateObjectnameFromStatename = function (statename) {
+    $log.debug("[RoutesController.generateObjectnameFromStatename]", statename);
+    var objectname = "";
+    var keys = statename.split('.');
+    for (var k = 0; k < keys.length; k++) {
+      objectname += UtilityService.capitalizeFirstLetter(keys[k]);
+    };
+    objectname = UtilityService.lowercaseFirstLetter(objectname);
+    return objectname;
+  }
+
+  var generateObjectnameFromUrl = function (url) {
+    $log.debug("[RoutesController.generateObjectnameFromUrl]", url);
+    var objectname = "";
+    var keys = url.split('/');
+    for (var k = 0; k < keys.length; k++) {
+      objectname += UtilityService.capitalizeFirstLetter(keys[k]);
+    };
+    objectname = UtilityService.lowercaseFirstLetter(objectname);
+    return objectname;
+  }
+
+  var generateObjectnameAndStatename = function (route) {
+    route.state.name = "";
+    route.state.name = appendToStatename(route.state.name, route.state.parent);
+    route.state.name = appendToStatename(route.state.name, route.key);
+    route.objectName = generateObjectnameFromStatename(route.state.name);
+    if(!angular.isString(route.objectName) || route.objectName.length <= 0) {
+      route.objectName = generateObjectnameFromUrl(route.url);
+    }
+    return route;
+  }
+
   $scope.$watch('routes', function (newValue, oldValue) {
-    $log.log(newValue);
-    for(var i = 0; i < newValue.length; i++) {
-      if(angular.isDefined(newValue[i].state.parent) && angular.isUndefined(newValue[i].key)) {
-        newValue[i].state.name = newValue[i].state.parent.toLowerCase();
-        newValue[i].objectName = newValue[i].state.parent.toLowerCase();
-      }
-      if(angular.isDefined(newValue[i].state.parent) && angular.isDefined(newValue[i].key)) {
-        var keys = newValue[i].key.split('.');
-        newValue[i].state.name = newValue[i].state.parent.toLowerCase() + "." + newValue[i].key.toLowerCase();
-        newValue[i].objectName = newValue[i].state.parent.toLowerCase();
-        for (var k = 0; k < keys.length; k++) {
-          newValue[i].objectName += UtilityService.capitalizeFirstLetter(keys[k]);
-        };
-      }
+    $log.log("[RoutesController.watch.routes]", newValue);
+    for(var i = 0; i < $scope.routes.length; i++) {
+      $scope.routes[i] = generateObjectnameAndStatename($scope.routes[i]);
     };
   }, true);
 
