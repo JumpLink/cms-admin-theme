@@ -47,13 +47,13 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
   }
 
   var generateObjectnameFromUrl = function (url) {
-    $log.debug("[RoutesController.generateObjectnameFromUrl]", url);
     var objectname = "";
     var keys = url.split('/');
     for (var k = 0; k < keys.length; k++) {
       objectname += UtilityService.capitalizeFirstLetter(keys[k]);
     };
     objectname = UtilityService.lowercaseFirstLetter(objectname);
+    $log.debug("[RoutesController.generateObjectnameFromUrl]", url, keys, objectname, objectname.length);
     return objectname;
   }
 

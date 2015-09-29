@@ -310,8 +310,10 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
       }
 
       // console.log("[Routes] state options", options);
-
-      $stateProvider.state(routes[i].state.name, options);
+      if(typeof(routes[i].state.name) === 'string' && routes[i].state.name.length > 0) {
+        $stateProvider.state(routes[i].state.name, options);
+      }
+      
     }
   };
 });
