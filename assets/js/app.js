@@ -134,13 +134,13 @@ jumplink.cms.config( function($stateProvider, $urlRouterProvider, $locationProvi
       authenticated: function (SessionService) {
         return SessionService.needToBeAuthenticated();
       },
-      users: function($sailsSocket, $log) {
-        return $sailsSocket.get('/user').then (function (data) {
-          return data.data;
-        }, function error (resp){
-          $log.error(resp);
-        });
-      }
+      // users: function($sailsSocket, $log) {
+      //   return $sailsSocket.get('/user').then (function (data) {
+      //     return data.data;
+      //   }, function error (resp){
+      //     $log.error(resp);
+      //   });
+      // }
     }
     , views: {
       'content' : {

@@ -83,6 +83,10 @@
           label(for='{{$index}}-state-parent')
             | &nbsp;&nbsp;Parent&nbsp;&nbsp;
           input.form-control(id="{{$index}}-state-parent", type='text', placeholder='parent', ng-model="route.state.parent")
+        //- .form-group
+        //-   label(for='{{$index}}-active') Use Parent for Active Class
+        //-   br
+        //-   toggle-switch(id="{{$index}}-active", ng-model="route.state.useParentForActiveClass")
         .form-group
           label(for='{{$index}}-state-name')
             | &nbsp;&nbsp;Name&nbsp;&nbsp;
