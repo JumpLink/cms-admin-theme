@@ -8,11 +8,13 @@
         th {{ 'E-Mail' }}
         th {{ 'Name' }}
         th {{ 'Aktion' }}
+        th {{ 'Role' }}
     tbody
       tr(ng-repeat="user in users", ui-sref="layout.user({index: user.id})")
         //- td {{user.color}}
         td {{user.email}}
         td {{user.name}}
+        td {{user.role}}
         td
           .btn-group
             button.btn.btn-danger.btn-xs(title="Benutzer löschen", ng-click="remove(user);$event.stopPropagation();")

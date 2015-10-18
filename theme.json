@@ -24,49 +24,94 @@
         "position": 1,
         "match": "/*home*",
         "title": "Home",
-        "url": "/home",
         "state": {
           "name": "layout.home",
           "customstate": false,
           "url": "",
           "views": "",
-          "resolve": ""
+          "resolve": "",
+          "parent": "Layout"
         },
-        "fallback": { 
+        "fallback": {
           "url": ""
-        }
+        },
+        "site": "admin",
+        "main": true,
+        "key": "home",
+        "objectName": "layoutHome",
+        "sitetitle": "JumpLink CMS Administration - Home",
+        "url": "/home",
+        "navbar": "header"
       },
       {
         "position": 2,
         "match": "/*themes*",
         "title": "Themes",
-        "url": "/themes",
         "state": {
           "name": "layout.themes",
           "customstate": false,
           "url": "",
           "views": "",
-          "resolve": ""
+          "resolve": "",
+          "parent": "Layout"
         },
-        "fallback": { 
+        "fallback": {
           "url": ""
-        }
+        },
+        "site": "admin",
+        "main": true,
+        "key": "themes",
+        "objectName": "layoutThemes",
+        "navbar": "header",
+        "sitetitle": "JumpLink CMS Administration - Themes",
+        "url": "/themes"
       },
       {
         "position": 3,
         "match": "/*routes*",
         "title": "Routes",
-        "url": "/routes",
         "state": {
           "name": "layout.routes",
           "customstate": false,
           "url": "",
           "views": "",
-          "resolve": ""
+          "resolve": "",
+          "parent": "Layout"
         },
-        "fallback": { 
+        "fallback": {
           "url": ""
-        }
+        },
+        "site": "admin",
+        "main": true,
+        "key": "routes",
+        "objectName": "layoutRoutes",
+        "sitetitle": "JumpLink CMS Administration - Routes",
+        "navbar": "header",
+        "url": "/routes"
+      },
+      {
+        "position": 4,
+        "match": "",
+        "title": "Users",
+        "main": true,
+        "state": {
+          "name": "layout.users",
+          "customstate": false,
+          "url": "",
+          "views": "",
+          "resolve": "",
+          "parent": "layout"
+        },
+        "url": "/users",
+        "alternativeUrls": [],
+        "fallback": {
+          "url": ""
+        },
+        "objectName": "layoutUsers",
+        "key": "users",
+        "sitetitle": "JumpLink CMS Administration - Users",
+        "navbar": "header",
+        "site": "admin"
       }
     ]
   }
