@@ -1,16 +1,8 @@
 jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, RoutesService, UtilityService, HistoryService) {
   if(angular.isUndefined($scope.routes)) $scope.routes = [];
-  $scope.showMainRoutes = true;
+  $scope.showMainRoutes = false;
 
   $scope.goToHashPosition = HistoryService.goToHashPosition;
-
-  // $scope.showOnlyMainRoutes = function() {
-  //   return function (route) {
-  //     $log.debug("showOnlyMainRoutes", route);
-  //     if($scope.showMainRoutes === false) return true;
-  //     else return route.main;
-  //   }
-  // };
 
   $rootScope.$watch('selectedHost', function(newValue, oldValue) {
     // $log.debug("[RoutesController] selectedHost changed from",oldValue,"to",newValue);
@@ -54,9 +46,12 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
   }, true);
 
   $scope.save = function() {
-    RoutesService.saveEachByHost($rootScope.selectedHost, $scope.routes, function(results) {
+    RoutesService.saveEachByHost($rootScope.selectedHost, $scope.routes, function(err, results) {
+      if(err) {
+        $log.error("[RouteController.save] Error!", err);
+        return err;
+      }
       $scope.routes = results;
-      $log.debug('[RouteController.save] result', results);
     });
   };
 
@@ -68,7 +63,6 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
   }
 
   $scope.add = function() {
-    $log.error("[RoutesController.add]");
     var data = {main: true};
     RoutesService.append($scope.routes, data, function(err, routes) {
       $scope.routes = routes;
