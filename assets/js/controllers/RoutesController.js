@@ -76,8 +76,9 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
   }, true);
 
   $scope.save = function() {
-    RoutesService.saveEachByHost($rootScope.selectedHost, $scope.routes, function(result) {
-      $log.debug('[RouteController.save] result', result);
+    RoutesService.saveEachByHost($rootScope.selectedHost, $scope.routes, function(results) {
+      $scope.routes = results;
+      $log.debug('[RouteController.save] result', results);
     });
   };
 
@@ -89,7 +90,10 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
   }
 
   $scope.add = function() {
-    RoutesService.append($scope.routes, {}, function(err, routes) {
+    $log.error("[RoutesController.add]");
+    var data = {main: true};
+    RoutesService.append($scope.routes, data, function(err, routes) {
+      $scope.routes = routes;
       if(err) $log.error("Error: On add routes!", err);
       $log.debug("[RoutesController.add] Add routes done!", routes);
     });
