@@ -35,35 +35,13 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
     return statename;
   }
 
-  var generateObjectnameFromStatename = function (statename) {
-    $log.debug("[RoutesController.generateObjectnameFromStatename]", statename);
-    var objectname = "";
-    var keys = statename.split('.');
-    for (var k = 0; k < keys.length; k++) {
-      objectname += UtilityService.capitalizeFirstLetter(keys[k]);
-    };
-    objectname = UtilityService.lowercaseFirstLetter(objectname);
-    return objectname;
-  }
-
-  var generateObjectnameFromUrl = function (url) {
-    var objectname = "";
-    var keys = url.split('/');
-    for (var k = 0; k < keys.length; k++) {
-      objectname += UtilityService.capitalizeFirstLetter(keys[k]);
-    };
-    objectname = UtilityService.lowercaseFirstLetter(objectname);
-    $log.debug("[RoutesController.generateObjectnameFromUrl]", url, keys, objectname, objectname.length);
-    return objectname;
-  }
-
   var generateObjectnameAndStatename = function (route) {
     route.state.name = "";
     route.state.name = appendToStatename(route.state.name, route.state.parent);
     route.state.name = appendToStatename(route.state.name, route.key);
-    route.objectName = generateObjectnameFromStatename(route.state.name);
+    route.objectName = RoutesService.generateObjectnameFromStatename(route.state.name);
     if(!angular.isString(route.objectName) || route.objectName.length <= 0) {
-      route.objectName = generateObjectnameFromUrl(route.url);
+      route.objectName = RoutesService.generateObjectnameFromUrl(route.url);
     }
     return route;
   }
