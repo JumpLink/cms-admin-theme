@@ -26,6 +26,17 @@
       span.form-control-feedback(ng-show="form.email.$error.required", title="Bitte geben Sie hier Ihre E-Mail-Adresse ein."): i.fa.fa-exclamation-triangle
       span.form-control-feedback(ng-show="form.email.$error.email", title="Dies ist keine korrekte E-Mail-Adresse."): i.fa.fa-exclamation-triangle
     //-
+    //- Role
+    //-
+    .form-group.has-feedback(ng-class="{'has-error': form.role.$invalid, 'has-success': form.role.$valid}")
+      label.control-label(for='role') Role
+      .input-group
+        .input-group-addon
+          i.fa.fa-user
+        input#role.form-control(type='text', name="role", required, placeholder='Ihre Rolle eingeben', ng-model="user.role")
+      span.form-control-feedback(ng-hide="form.role.$error.required", title="Alles Okay!"): i.fa.fa-check
+      span.form-control-feedback(ng-show="form.role.$error.required", title="Bitte geben Sie hier Ihre Rolle ein."): i.fa.fa-exclamation-triangle
+    //-
     //- Farbe
     //-
     //- .form-group.has-feedback(ng-class="{'has-error': form.color.$invalid, 'has-success': form.color.$valid}")
