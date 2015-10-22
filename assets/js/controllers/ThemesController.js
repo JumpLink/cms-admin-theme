@@ -16,6 +16,6 @@ jumplink.cms.controller('ThemesController', function($rootScope, $scope, $log, T
       // $scope.themeSettings = data;
       $log.debug(data);
     });
-  }
+  };
   
 });

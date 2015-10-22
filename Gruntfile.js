@@ -35,7 +35,7 @@ module.exports = function(grunt) {
     'assets/third-party/angular-moment/angular-moment.js',
     'assets/third-party/moment/locale/de.js',
     'assets/third-party/angular-fullscreen/src/angular-fullscreen.js',
-    'assets/third-party/webodf.js/webodf.js',
+    // 'assets/third-party/webodf.js/webodf.js',
     'assets/third-party/angular-animate/angular-animate.js',
     'assets/third-party/angular-ui-router/release/angular-ui-router.js',
     'assets/third-party/angular-sanitize/angular-sanitize.js',
@@ -65,6 +65,7 @@ module.exports = function(grunt) {
     'assets/third-party/js-beautify/js/lib/beautify-html.js',
   
     //- angular-leaflet-directive: https://github.com/tombatossals/angular-leaflet-directive
+    'assets/third-party/angular-simple-logger/dist/index.js',
     'assets/third-party/leaflet/dist/leaflet-src.js',
     'assets/third-party/Leaflet.label/dist/leaflet.label-src.js',
     'assets/third-party/angular-leaflet-directive/dist/angular-leaflet-directive.js',
@@ -76,7 +77,7 @@ module.exports = function(grunt) {
     'assets/third-party/async/lib/async.js',
   
     //- generic angular filters: https://github.com/niemyjski/angular-filters
-    'assets/third-party/ng-filters/dist/angular-filters.js',
+    'assets/third-party/angular-filters/dist/angular-filters.js',
   
     //- angular-file-upload: https://github.com/nervgh/angular-file-upload
     'assets/third-party/angular-file-upload/dist/angular-file-upload.min.js',
@@ -91,27 +92,50 @@ module.exports = function(grunt) {
     'assets/third-party/socket.io-client/socket.io.js',
     'assets/third-party/sails.io.js/sails.io.js',
     'assets/third-party/angularSails/dist/ngsails.io.js',
-  
+
+    //- https://github.com/nelsonomuto/angular-ui-form-validation
+    //'assets/third-party/angular-ui-form-validation/dist/angular-ui-form-validation.js',
+
+    //- https://github.com/huei90/angular-validation
+    'assets/third-party/angular-validation/dist/angular-validation.js',
+    'assets/third-party/angular-validation/dist/angular-validation-rule.js',
+  ];
+
+  var ownJsFiles = [
     'assets/third-party/jumplink-cms-angular/src/**/*.js',
 
     'assets/js/app.js',
-    'assets/js/translations.js',
+    'assets/js/config/*.js',
     'assets/js/services/*.js',
     'assets/js/controllers/*.js',
     'assets/js/directives/*.js',
     'assets/js/modules/*.js',
-  ];
+  ]
 
   
   grunt.initConfig({
     pkg: grunt.file.readJSON('bower.json'),
     
     concat: {
-      options: {
-        separator: ';\n'
-      },
-      dist: {
+      extern: {
+        options: {
+          separator: ';\n'
+        },
         src: jsFiles,
+        dest: 'assets/js/app.extern.concat.js'
+      },
+      intern: {
+        options: {
+          separator: '\n'
+        },
+        src: ownJsFiles,
+        dest: 'assets/js/app.intern.concat.js'
+      },
+      all: {
+        options: {
+          separator: ';\n'
+        },
+        src: jsFiles.concat(ownJsFiles),
         dest: 'assets/js/app.concat.js'
       }
     },
@@ -120,43 +144,62 @@ module.exports = function(grunt) {
       options: {
           singleQuotes: true,
       },
-  		dist: {
-  			src: 'assets/js/app.concat.js',
-  			dest: 'assets/js/app.annotated.js'
-  		}
+      extern: {
+        src: 'assets/js/app.extern.concat.js',
+        dest: 'assets/js/app.extern.annotated.js'
+      },
+      intern: {
+        src: 'assets/js/app.intern.concat.js',
+        dest: 'assets/js/app.intern.annotated.js'
+      },
+      all: {
+        src: 'assets/js/app.concat.js',
+        dest: 'assets/js/app.annotated.js'
+      }
     },
     
     uglify: {
       options: {
         mangle: true // http://stackoverflow.com/questions/17238759/angular-module-minification-bug
       },
-      dist: {
+      extern: {
+        src: 'assets/js/app.extern.annotated.js',
+        dest: 'assets/js/app.extern.min.js'
+      },
+      intern: {
+        src: 'assets/js/app.intern.annotated.js',
+        dest: 'assets/js/app.intern.min.js'
+      },
+      all: {
         src: 'assets/js/app.annotated.js',
         dest: 'assets/js/app.min.js'
-      }
+      },
     },
 
     jshint: {
       options: {
         curly: true,
+        evil: true,
         eqeqeq: true,
-        eqnull: true,
+        eqnull: false,
         browser: true,
-        asi: true,
+        asi: false,
+        force: false,
         globals: {
           angular: true
         },
       },
-      before: jsFiles,
-      afterconcat: ['assets/js/app.concat.js'],
-      aftermin: ['assets/js/app.min.js']
+      before: ownJsFiles,
+      afterconcat: ['assets/js/app.intern.concat.js'],
+      afterannotated: ['assets/js/app.intern.annotated.js'],
+      aftermin: ['assets/js/app.intern.min.js']
     },
     
     less: {
       dist: {
         options: {
           cleancss: true,
-          compress: true
+          compress: false
         },
         files: [
           {
@@ -169,30 +212,44 @@ module.exports = function(grunt) {
         ]
       }
     },
+
+    postcss: {
+      options: {
+        map: false, // inline sourcemaps
+        processors: [
+          require('pixrem')(), // add fallbacks for rem units
+          require('autoprefixer')({browsers: ['last 2 versions', '> 1%', 'ie > 7']}), // add vendor prefixes
+          require('cssnano')() // minify the result
+        ]
+      },
+      dist: {
+        src: 'assets/styles/*.css'
+      }
+    },
     
     watch: {
       jsdev: {
         // Assets to watch:
-        files: [jsFiles, 'assets/js/**/*.js', '!assets/js/app.*.js', 'Gruntfile.js'],
+        files: [jsFiles.concat(ownJsFiles), 'assets/js/**/*.js', '!assets/js/app.*.js', 'assets/third-party/jumplink-cms-angular/src/**/*.js', 'Gruntfile.js'],
 
         // When assets are changed:
-        tasks: ['concat:dist']
+        tasks: ['jshint:before', 'concat:intern', 'jshint:afterconcat', 'concat:all']
       },
 
       jsprod: {
         // Assets to watch:
-        files: [jsFiles, 'assets/js/**/*.js', '!assets/js/app.*.js', 'Gruntfile.js'],
+        files: [jsFiles.concat(ownJsFiles), 'assets/js/**/*.js', '!assets/js/app.*.js', 'Gruntfile.js'],
 
         // When assets are changed:
-        tasks: ['concat:dist', 'ngAnnotate:dist', 'uglify:dist']
+        tasks: ['jshint:before', 'concat:intern', 'ngAnnotate:intern', 'jshint:afterannotated', 'uglify:intern', 'jshint:aftermin', 'concat:all', 'ngAnnotate:all', 'uglify:all']
       },
 
       less: {
         // Assets to watch:
-        files: ['assets/styles/**/*.less', 'Gruntfile.js'],
+        files: ['assets/styles/**/*.less', 'assets/third-party/jumplink-cms-angular/src/**/*.less', 'Gruntfile.js'],
 
         // When assets are changed:
-        tasks: ['less:dist']
+        tasks: ['less:dist', 'postcss:dist']
       },
 
     }
@@ -204,12 +261,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-postcss');
 
+  grunt.registerTask('watch', [ 'watch:jsdev', 'watch:less' ]);
   grunt.registerTask('watch-dev', [ 'watch:jsdev', 'watch:less' ]);
   grunt.registerTask('watch-prod', [ 'watch:jsprod', 'watch:less' ]);
 
-  grunt.registerTask('build-dev', [ 'concat:dist', 'less:dist' ]);
-  grunt.registerTask('build-prod', [ 'concat:dist', 'ngAnnotate:dist', 'uglify:dist', 'less:dist' ]);
+  grunt.registerTask('build-dev', ['jshint:before', 'concat:intern', 'jshint:afterconcat', 'concat:all', 'less:dist' ]);
+  grunt.registerTask('build-prod', ['jshint:before', 'concat:intern', 'ngAnnotate:intern', 'jshint:afterannotated', 'concat:extern', 'ngAnnotate:extern', 'uglify:extern', 'concat:all', 'ngAnnotate:all', 'uglify:all', 'less:dist' ]);
 
   grunt.registerTask('clean', [ ]);
 };

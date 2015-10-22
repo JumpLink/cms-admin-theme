@@ -4,20 +4,21 @@ jumplink.cms.controller('ErrorController', function($rootScope, $scope, $log, $s
   $scope.signin = function () {
     $log.debug($scope.user);
     // $scope.user.role = 'superadmin';
-    SigninService.signin($scope.user, false, function (error, result) {
-      if(error) $scope.error = error;
-      else {
-        $state.go('layout.home');
+    SigninService.signin($scope.user, false, function (err, result) {
+      if(err) {
+        $scope.error = err;
+        return err;
       }
+      $state.go('layout.home');
       $log.debug(result);
     });
-  }
+  };
 
   $scope.signin = function () {
     $log.debug("[SigninController.signin]", $scope.user);
-    SigninService.signin($scope.user, false, function (error, result) {
-      if(error) {
-        $scope.error = error;
+    SigninService.signin($scope.user, false, function (err, result) {
+      if(err) {
+        $scope.error = err;
         return $scope.error ;
       }
       if(result.authenticated) {

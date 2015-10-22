@@ -27,10 +27,8 @@ jumplink.cms.controller('AppController', function($rootScope, $scope, $state, $w
       $sailsSocket.subscribe('reconnect', function(msg){
         $rootScope.pop('info', 'Sie sind wieder mit dem Server verbunden', "");
       });
-
     });
-
-  }
+  };
 
   var adminSubscribes = function() {
     // subscripe on server
@@ -39,19 +37,19 @@ jumplink.cms.controller('AppController', function($rootScope, $scope, $state, $w
       // called on any sended email from server
       $sailsSocket.subscribe('email', function(email){
 
-        var body = ''
-          +'<dl>'
-            +'<dt>Absender</dt>'
-            +'<dd><a href="mailto:'+email.from+'">'+email.from+'</a></dd>'
-            +'<dt>Betreff</dt>'
-            +'<dd>'+email.subject+'</dd>';
+        var body = ''+
+          '<dl>'+
+            '<dt>Absender</dt>'+
+            '<dd><a href="mailto:'+email.from+'">'+email.from+'</a></dd>'+
+            '<dt>Betreff</dt>'+
+            '<dd>'+email.subject+'</dd>';
             if(email.attachments) {
-              body += ''
-              +'<dt>Anhänge</dt>'
-              +'<dd>'+email.attachments.length+'</dd>';
+              body += ''+
+              '<dt>Anhänge</dt>'+
+              '<dd>'+email.attachments.length+'</dd>';
             }
-            body += ''
-          +'</dl>';
+            body += ''+
+          '</dl>';
 
         $rootScope.pop('info', 'Eine E-Mail wurde versendet.', body, null, 'trustedHtml');
       });
@@ -62,7 +60,7 @@ jumplink.cms.controller('AppController', function($rootScope, $scope, $state, $w
       });
 
     });
-  }
+  };
 
   // http://stackoverflow.com/questions/18608161/angularjs-variable-set-in-ng-init-undefined-in-scope
   $rootScope.$watch('authenticated', function () {
@@ -80,8 +78,8 @@ jumplink.cms.controller('AppController', function($rootScope, $scope, $state, $w
 
   $rootScope.fullscreenIsSupported = Fullscreen.isSupported();
   $rootScope.isFullscreen = false;
-  Fullscreen.$on('FBFullscreen.change', function(evt, isFullscreenEnabled){
-    $rootScope.isFullscreen = isFullscreenEnabled == true;
+  Fullscreen.$on('FBFullscreen.change', function (evt, isFullscreenEnabled) {
+    $rootScope.isFullscreen = isFullscreenEnabled === true;
     $rootScope.$apply();
   });
 
@@ -165,7 +163,7 @@ jumplink.cms.controller('AppController', function($rootScope, $scope, $state, $w
       $rootScope.authenticated = false;
       $rootScope.pop('success', 'Erfolgreich abgemeldet', "");
     });
-  }
+  };
 
   $scope.goToState = $state.go;
 

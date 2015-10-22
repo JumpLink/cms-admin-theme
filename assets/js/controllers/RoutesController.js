@@ -1,5 +1,7 @@
 jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, RoutesService, UtilityService, HistoryService) {
-  if(angular.isUndefined($scope.routes)) $scope.routes = [];
+  if(angular.isUndefined($scope.routes)) {
+    $scope.routes = [];
+  }
   $scope.showMainRoutes = false;
 
   $scope.goToHashPosition = HistoryService.goToHashPosition;
@@ -8,8 +10,12 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
     // $log.debug("[RoutesController] selectedHost changed from",oldValue,"to",newValue);
     if(angular.isDefined(newValue)) {
       RoutesService.findByHost({host:newValue}, function(err, routes) {
-        if(err) $scope.routes = [];
-        else $scope.routes = routes;
+        if(err) {
+          $scope.routes = [];
+        }
+        else {
+          $scope.routes = routes;
+        }
         // $log.debug("[RoutesController] new routes",routes);
       });
     }
@@ -25,7 +31,7 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
       }
     }
     return statename;
-  }
+  };
 
   var generateObjectnameAndStatename = function (route) {
     route.state.name = "";
@@ -36,13 +42,13 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
       route.objectName = RoutesService.generateObjectnameFromUrl(route.url);
     }
     return route;
-  }
+  };
 
   $scope.$watch('routes', function (newValue, oldValue) {
     $log.log("[RoutesController.watch.routes]", newValue);
     for(var i = 0; i < $scope.routes.length; i++) {
       $scope.routes[i] = generateObjectnameAndStatename($scope.routes[i]);
-    };
+    }
   }, true);
 
   $scope.save = function() {
@@ -60,26 +66,33 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
     RoutesService.destroy($scope.routes, index, route, function(result) {
       $log.debug('[RouteController.destroy] result', result);
     });
-  }
+  };
 
   $scope.add = function() {
     var data = {main: true};
     RoutesService.append($scope.routes, data, function(err, routes) {
       $scope.routes = routes;
-      if(err) $log.error("Error: On add routes!", err);
+      if(err) {
+        $log.error("Error: On add routes!", err);
+        return err;
+      }
       $log.debug("[RoutesController.add] Add routes done!", routes);
     });
   };
 
   $scope.addAlternativeUrl = function($index, route) {
     $log.debug("[RoutesController.addAlternativeUrl]", $index, route);
-    if(angular.isUndefined(route.alternativeUrls) || !angular.isArray(route.alternativeUrls)) route.alternativeUrls = [""];
-    else route.alternativeUrls.push("");
+    if(angular.isUndefined(route.alternativeUrls) || !angular.isArray(route.alternativeUrls)) {
+      route.alternativeUrls = [""];
+    }
+    route.alternativeUrls.push("");
   };
 
   $scope.removeAlternativeUrl = function($index, route) {
     $log.debug("[RoutesController.removeAlternativeUrl]", $index, route);
-    if(route.alternativeUrls.length >= 1) route.alternativeUrls.pop();
+    if(route.alternativeUrls.length >= 1) {
+      route.alternativeUrls.pop();
+    }
   };
 
   $scope.edit = function($index, route) {
@@ -88,15 +101,21 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
 
   $scope.moveForward = function(index, route) {
     RoutesService.moveForward(index, $scope.routes, function(err, routes) {
-      if(err) $log.error("Error: On move route forward!", err);
-      else $scope.routes = routes;
+      if(err) {
+        $log.error("Error: On move route forward!", err);
+        return err;
+      }
+      $scope.routes = routes;
     });
   };
 
   $scope.moveBackward = function(index, route) {
     RoutesService.moveBackward(index, $scope.routes, function(err, routes) {
-      if(err) $log.error("Error: On move route backward!", err);
-      else $scope.routes = routes;
+      if(err) {
+        $log.error("Error: On move route backward!", err);
+        return err;
+      }
+      $scope.routes = routes;
     });
   };
 

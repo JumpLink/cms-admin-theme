@@ -12,7 +12,7 @@ jumplink.cms.controller('UsersController', function($scope, $rootScope, $sailsSo
 
   $scope.remove = function(user) {
     UserService.remove($scope.users, user);
-  }
+  };
 
   UserService.subscribe();
 
