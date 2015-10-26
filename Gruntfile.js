@@ -99,6 +99,8 @@ module.exports = function(grunt) {
     //- https://github.com/huei90/angular-validation
     'assets/third-party/angular-validation/dist/angular-validation.js',
     'assets/third-party/angular-validation/dist/angular-validation-rule.js',
+
+    'assets/third-party/download/download.js',
   ];
 
   var ownJsFiles = [

@@ -38,6 +38,7 @@ jumplink.cms = angular.module('jumplink.cms', [
   'jumplink.cms.sidebar',
   'jumplink.cms.toolbar',
   'jumplink.cms.signin',
+  'ngDownload',
 ]);
 
 jumplink.cms.run(function ($rootScope, $state, $window, $log) {

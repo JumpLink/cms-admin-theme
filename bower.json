@@ -52,7 +52,8 @@
     "socket.io-client": "~1.3.5",
     "webodf.js": "~0.5.7",
     "angular-filters": "ng-filters#~1.2.0",
-    "angular-moment": "1.0.0-beta.2"
+    "angular-moment": "1.0.0-beta.2",
+    "download": "rndme/download"
   },
   "resolutions": {
     "angular": "1.3.*"

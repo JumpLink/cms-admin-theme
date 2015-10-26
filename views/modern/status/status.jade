@@ -1,0 +1,45 @@
+.container-fluid(style="min-height: 400px;")
+  .row
+    .col-md-2.hidden-sm.hidden-xs
+      .bs-sidebar(hidden-print, role="complementary", data-offset-top="-50", bs-affix)
+        ul.nav.bs-sidenav
+          li(ng-repeat="nav in navs", data-target="{{'#'+nav.target}}", bs-scrollspy, data-offset="70")
+            a(ng-click="goTo(nav.target)") {{nav.name}}
+    .col-md-10
+      //- anchor
+      h1.page-header#cms Status
+      dl.dl-horizontal
+        dt App name
+        dd {{status.pm2[0].name}}
+        dt Status
+        dd(ng-class="{'text-success': status.pm2[0].pm2_env.status == 'online', 'text-danger': status.pm2[0].pm2_env.status != 'online'}") {{status.pm2[0].pm2_env.status}}
+        dt Version
+        dd v{{status.version}}
+        dt Runtime
+        dd {{status.runtime.version}}
+        dt Architecture
+        dd {{status.runtime.arch}}
+        dt Platform
+        dd {{status.runtime.platform}}
+        dt Environment
+        dd {{status.config.environment}}
+        dt Port
+        dd {{status.config.port}}
+        dt PID
+        dd {{status.pm2[0].pid}}
+        dt PM ID
+        dd {{status.pm2[0].pm_id}}
+        dt User
+        dd {{status.pm2[0].pm2_env.USER}}
+        dt Auto restart
+        dd {{status.pm2[0].pm2_env.autorestart}}
+        dt Created at
+        dd(am-time-ago="status.pm2[0].pm2_env.created_at")
+        dt Uptime
+        dd {{uptime}}
+        dt Restarts
+        dd {{status.pm2[0].pm2_env.restart_time}}
+      .btn-group
+        button(type="button", ng-click="restart()").btn.btn-warning Restart
+        button(type="button", ng-click="stop()").btn.btn-danger Stop
+adminbar

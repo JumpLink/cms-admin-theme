@@ -1,4 +1,4 @@
-jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, RoutesService, UtilityService, HistoryService) {
+jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, $download, RoutesService, UtilityService, HistoryService, SortableService) {
   if(angular.isUndefined($scope.routes)) {
     $scope.routes = [];
   }
@@ -14,7 +14,7 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
           $scope.routes = [];
         }
         else {
-          $scope.routes = routes;
+          $scope.routes = SortableService.sort(routes);
         }
         // $log.debug("[RoutesController] new routes",routes);
       });
@@ -77,6 +77,15 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
         return err;
       }
       $log.debug("[RoutesController.add] Add routes done!", routes);
+    });
+  };
+
+  /**
+   * Export routes and download them
+   */
+  $scope.download = function() {
+    RoutesService.exportByHost($rootScope.selectedHost, true, function(err, results) {
+
     });
   };
 

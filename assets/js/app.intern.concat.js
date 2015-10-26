@@ -670,9 +670,10 @@ angular.module('jumplink.cms.content', [
     'ui.ace',
     'sails.io',
     'jumplink.cms.sortable',
-    'ngFocus'
+    'ngFocus',
+    'jumplink.cms.utilities',
   ])
-  .service('ContentService', function ($rootScope, $log, $sailsSocket, $filter, $modal, SortableService, UtilityService, focus) {
+  .service('ContentService', function ($rootScope, $log, $sailsSocket, $filter, $modal, SortableService, UtilityService, focus, $async) {
 
     var showHtml = false;
     var editModal = null;
@@ -783,7 +784,7 @@ angular.module('jumplink.cms.content', [
         data.type = "dynamic";
       }
       if(!data || !data.page) {
-        callback("Page not set.");
+        $log.error("[ContentService] Page not set.");
       }
       return data;
     };
@@ -1024,6 +1025,27 @@ angular.module('jumplink.cms.content', [
         });
       });
     };
+    
+    var saveParallel = function(page, logger, options, obj, callback) {
+      $async.parallel(obj, function(err, results) {
+        if(err) {
+          $log.error("Error: On save content!", err);
+          logger('error', 'Seiteninhalt konnte nichtgespeichert werden', err);
+          if(angular.isFunction(callback)) {
+            return callback(err);
+          }
+          return err;
+        }
+        if(options.applyResults) {
+          options.scope = angular.extend(options.scope, results);
+        }
+        logger('success', 'Seiteninhalt wurde gespeichert', "");
+        if(angular.isFunction(callback)) {
+          return callback(null, results);
+        }
+        return results;
+      });
+    };
 
     var findOne = function(page, name, type, callback, next) {
       var errors = [
@@ -1035,7 +1057,7 @@ angular.module('jumplink.cms.content', [
         name: name
       };
       var url = '/content/find';
-      if(type) {
+      if(angular.isDefined(type) && type !== null) {
         query.type = type;
       }
       return $sailsSocket.put(url, query).then (function (data) {
@@ -1068,11 +1090,12 @@ angular.module('jumplink.cms.content', [
         "Error: On trying to find all with page: "+page+" and type: "+type,
         "Warn: On trying to find all "+page+" contents! Not found, content is empty!"
       ];
-      var query = {
-        page: page,
-      };
+      var query = {};
       var url = '/content/findall';
-      if(type) {
+      if(angular.isDefined(page) && page !== null) {
+        query.page = page;
+      }
+      if(angular.isDefined(type) && type !== null) {
         query.type = type;
       }
       return $sailsSocket.put(url, query).then (function (data) {
@@ -1144,10 +1167,7 @@ angular.module('jumplink.cms.content', [
     };
 
     /**
-     * Resolve function for angular ui-router.
-     * name, callback and next parameters are optional.
-     * use next to transform the result before you get it back
-     * use callback if you want not use promise
+     *
      */
     var find = function(page, name, type, callback, next) {
       //- get soecial content (one)
@@ -1180,6 +1200,7 @@ angular.module('jumplink.cms.content', [
       fixEach: fixEach,
       save: save,
       saveOne: saveOne,
+      saveParallel: saveParallel,
       find: find,
       resolve: find, // alias
       findOne: findOne,
@@ -1256,6 +1277,190 @@ angular.module('jumplink.cms.content.medium', [
       }
     }
   };
+})
+.directive('jlContentBlocks', function ($compile, $window, mediumOptions, ContentMediumService, SubnavigationService, HistoryService) {
+
+  return {
+    restrict: 'E',
+    templateUrl: '/views/modern/contentBlocks.jade',
+    scope: {
+      authenticated : "=",
+      html: "=",
+      contents: "=",
+      navs: "=?",
+      afterRefresh: "=?",
+      afterSave: "=?",
+      afterRemove: "=?",
+      afterEdit: "=?",
+      afterAdd: "=?",
+      subnavigation: "=?",
+      afterSaveNav: "=?",
+      afterRemoveNav: "=?",
+      afterEditNav: "=?",
+      afterAddNav: "=?",
+      logger: "=",
+      page: "=?",
+      mediumOptions: "=?",
+      mediumBindOptions: "=?",
+
+    },
+    link: function ($scope, $element, $attrs) {
+    },
+    controller: function ($rootScope, $scope, ContentService, $log, $state) {
+
+      ContentService.setEditModal($scope);
+      SubnavigationService.setEditModal($scope);
+      $scope.goTo = HistoryService.goToHashPosition;
+      ContentService.subscribe();
+      SubnavigationService.subscribe();
+      // SubnavigationService.resizeOnImagesLoaded();
+
+      if(angular.isUndefined($scope.page)) {
+        $scope.page = $state.current.name;
+      }
+
+      if(angular.isUndefined($scope.subnavigation)) {
+        $scope.subnavigation = false;
+      }
+
+      if(angular.isUndefined($scope.afterRefresh)) {
+        $scope.afterRefresh = function (err, result) {
+          if(err) {
+            return $scope.logger('error', "Inhaltsblock wurde nicht erneuert!", err);
+          }
+          $scope.logger('success', "Inhaltsblock erneuert!", "");
+        };
+      }
+
+      if(angular.isUndefined($scope.afterSave)) {
+        $scope.afterSave = function (err, result) {
+          if(err) {
+            return $scope.logger('error', "Inhaltsblock wurde nicht gespeichert!", err);
+          }
+          $scope.logger('success', "Inhaltsblock gespeichert!", result.title);
+        };
+      }
+
+      if(angular.isUndefined($scope.afterRemove)) {
+        $scope.afterRemove = function (err, result) {
+          if(err) {
+            return $scope.logger('error', "Inhaltsblock wurde nicht entfernt!", err);
+          }
+          $scope.logger('success', "Inhaltsblock entfernt!", result.title);
+        };
+      }
+
+      if(angular.isUndefined($scope.afterEdit)) {
+        $scope.afterEdit = function (err, result) {
+          if(err) {
+            return $scope.logger('error', "Inhaltsblock wurde nicht bearbeitet!", err);
+          }
+          $scope.logger('success', "Inhaltsblock bearbeitet!", result.title);
+        };
+      }
+
+      if(angular.isUndefined($scope.afterAdd)) {
+        $scope.afterAdd = function (err, result) {
+          if(err) {
+            return $scope.logger('error', "Inhaltsblock wurde nicht hinzugefügt!", err);
+          }
+          $scope.logger('success', "Inhaltsblock hinzugefügt!", result.title);
+        };
+      }
+
+      if(angular.isUndefined($scope.afterSaveNav)) {
+        $scope.afterSaveNav = function (err, result) {
+          if(err) {
+            return $scope.logger('error', "Navigation wurde nicht gespeichert!", err);
+          }
+          $scope.logger('success', "Navigation gespeichert!", result.title);
+        };
+      }
+
+
+      $scope.add = function() {
+        var errors = [
+          "Error: Konnte Inhaltsblock nicht erzeugen",
+          "Error: Konnte Inhaltsblock nicht hinzufügen",
+        ];
+
+        var successes = [
+          "Neuen Inhaltsblock erfolgreich hinzugefügt",
+          "Neue Subnavigation erfolgreich hinzugefügt",
+          "Neuen Block erfolgreich hinzugefügt",
+        ];
+
+        if(!$scope.authenticated) {
+          return false;
+        }
+        // generates new content and opens the modal
+        ContentService.createEdit($scope.contents, $scope.page, function(err, content) {
+          if(err) {
+            return $scope.afterAdd(err);
+          }
+          ContentService.append($scope.contents, content, $scope.afterAdd);  
+        });
+      };
+
+      $scope.moveForward = function(index, content) {
+        if(!$scope.authenticated) {
+          return false;
+        }       
+        SortableService.moveForward(index, $scope.contents, function(err, contents) {
+          if(err) {
+            $log.error("Error: On move content forward!", err);
+            return err;
+          }
+          $scope.contents = contents;
+        });
+      };
+
+      $scope.moveBackward = function(index, content) {
+        if(!$scope.authenticated) {
+          return false;
+        }
+        SortableService.moveBackward(index, $scope.contents, function(err, contents) {
+          if(err) {
+            $log.error("Error: On move content backward!", err);
+            return err;
+          }
+          $scope.contents = contents;
+        });
+      };
+
+      $scope.edit = function(index, content) {
+        if(!$scope.authenticated) {
+          return false;
+        }
+        ContentService.edit(content, $scope.afterEdit);
+      };
+
+      $scope.remove = function(index, content) {
+        if(!$scope.authenticated) {
+          return false;
+        }
+        ContentService.remove($scope.contents, index, content, $scope.page, $scope.afterRemove);
+      };
+
+      $scope.refresh = function() {
+        ContentService.refresh($scope.contents, $scope.afterRefresh);
+      };
+
+      $scope.toggleHtml = function(index, content) {
+        content.html = content.html !== true;
+      };
+
+      $scope.save = function() {
+        if(!$scope.authenticated) {
+          return false;
+        }
+        ContentService.save($scope.contents, $scope.page, $scope.afterSave);
+        if($scope.subnavigation) {
+          SubnavigationService.save($scope.navs, $scope.page, $scope.afterSaveNav);
+        }
+      };
+    }
+  };
 });
 // window.saveAs
 // Shims the saveAs method, using saveBlob in IE10. 
@@ -1327,6 +1532,11 @@ if (!Date.now) {
         window.cancelAnimationFrame = clearTimeout;
     }
 }());
+// https://github.com/rndme/download
+angular.module('ngDownload', [])
+.service('$download', function () { 
+  return download;
+});
 angular.module('jumplink.cms.event', [
   'mgcrea.ngStrap',
   'angular-medium-editor',
@@ -2411,6 +2621,16 @@ angular.module('jumplink.cms.routes', [
 
   this.state = $stateProvider.state;
 
+  this.when = function (url1, url2) {
+    $urlRouterProvider.when(url1, url2);
+  };
+
+  this.setLayouts = function(layouts) {
+    for (var stateName in layouts ) {
+      this.state(stateName, layouts[stateName]);
+    }
+  };
+
   this.setRoutes = function(routes, routeOptions) {
     /**
      * Load optional addional states.
@@ -2465,7 +2685,7 @@ angular.module('jumplink.cms.routes', [
         if(angular.isArray(routes[i].alternativeUrls)) {
           for (var a = 0; a < routes[i].alternativeUrls.length; a++) {
             // e.g. $urlRouterProvider.when('/referenzen', '/referenzen/uebersicht');
-            // console.log("New redirect: "+routes[i].alternativeUrls[a]+" -> "+routes[i].url);
+            console.log("New redirect: "+routes[i].alternativeUrls[a]+" -> "+routes[i].url);
             $urlRouterProvider.when(routes[i].alternativeUrls[a], routes[i].url);
           }
         }
@@ -2503,7 +2723,7 @@ angular.module('jumplink.cms.routes', [
     return result;
   };
 })
-.service('RoutesService', function ($rootScope, JLSailsService, $log, SortableService, UtilityService) {
+.service('RoutesService', function ($rootScope, $download, JLSailsService, $log, SortableService, UtilityService) {
 
   var create = function(data) {
     $log.debug("[RoutesService.create] data", data);
@@ -2628,6 +2848,31 @@ angular.module('jumplink.cms.routes', [
     return JLSailsService.resolve('/Routes/findByHost', query, options, callback);
   };
 
+  /**
+   * For superadminsd
+   */
+  var exportByHost = function(host, download, callback) {
+    // $log.debug("[RoutesService.findByHost]");
+    var options = {
+      method: 'post',
+      resultIsArray: true
+    };
+    
+    return JLSailsService.resolve('/Routes/exportByHost', {host: host}, options, function(err, data) {
+      $log.debug("[RoutesService.exportByHost]", err, data);
+      if(err) {
+        if(download) {
+          $download(JSON.stringify(data), "error.txt", "text/plain");
+        }
+        return callback(err);
+      }
+      if(download) {
+        $download(JSON.stringify(data), "routes.json", "text/json");
+      }
+      return callback(err, data);
+    });
+  };
+
   var updateOrCreate = function(route, callback) {
     $log.debug("[RoutesService.updateOrCreate]", route);
     var options = {
@@ -2698,6 +2943,7 @@ angular.module('jumplink.cms.routes', [
     find: find,
     findOne: findOne,
     findByHost: findByHost,
+    exportByHost: exportByHost,
     updateOrCreate: updateOrCreate,
     updateOrCreateByHost: updateOrCreateByHost,
     updateOrCreateEach: updateOrCreateEach,
@@ -2762,7 +3008,7 @@ angular.module('jumplink.cms.sails', [
       return deferred.promise;
     };
     return {
-      resolve: resolve
+      resolve: resolve,
     };
   })
 ;
@@ -3153,12 +3399,16 @@ angular.module('jumplink.cms.signin', [
 angular.module('jumplink.cms.sortable', [
     'jumplink.cms.utilities'
   ])
-  .service('SortableService', function (UtilityService, $log) {
+  .service('SortableService', function (UtilityService, $log, $filter) {
     var resetPosition = function (array) {
       for (var i = array.length - 1; i >= 0; i--) {
         array[i].position = i+1;
       }
       return array;
+    };
+
+    var sort = function(objects) {
+      return $filter('orderBy')(objects, 'position');
     };
 
     /*
@@ -3363,6 +3613,7 @@ angular.module('jumplink.cms.sortable', [
 
     return {
       resetPosition: resetPosition,
+      sort: sort,
       swap: swap,
       moveObjectToAnotherArray: moveObjectToAnotherArray,
       move: move,
@@ -3593,6 +3844,146 @@ angular.module('jumplink.cms.subnavigation', [
     save: save,
     resolve: resolve
   };
+})
+
+.directive('jlSubnavigation', function ($compile, $window, SubnavigationService, HistoryService) {
+
+  return {
+    restrict: 'E',
+    templateUrl: '/views/modern/subnavigation.bootstrap.jade',
+    scope: {
+      authenticated : "=",
+      navs: "=",
+      afterSave: "=?",
+      afterRemove: "=?",
+      afterEdit: "=?",
+      afterAdd: "=?",
+      logger: "=",
+      page: "=?"
+
+    },
+    link: function ($scope, $element, $attrs) {
+    },
+    controller: function ($rootScope, $scope, ContentService, $log, $state) {
+
+      SubnavigationService.setEditModal($scope);
+      $scope.goTo = HistoryService.goToHashPosition;
+      SubnavigationService.subscribe();
+      // SubnavigationService.resizeOnImagesLoaded();
+
+      if(angular.isUndefined($scope.page)) {
+        $scope.page = $state.current.name;
+      }
+
+      if(angular.isUndefined($scope.afterSave)) {
+        $scope.afterSave = function (err, result) {
+          if(err) {
+            return $scope.logger('error', "Navigation wurde nicht gespeichert!", err);
+          }
+          $scope.logger('success', "Navigation gespeichert!", result.title);
+        };
+      }
+
+      if(angular.isUndefined($scope.afterRemove)) {
+        $scope.afterRemove = function (err, result) {
+          if(err) {
+            return $scope.logger('error', "Navigation wurde nicht entfernt!", err);
+          }
+          $scope.logger('success', "Navigation entfernt!", result.title);
+        };
+      }
+
+      if(angular.isUndefined($scope.afterEdit)) {
+        $scope.afterEdit = function (err, result) {
+          if(err) {
+            return $scope.logger('error', "Navigation wurde nicht bearbeitet!", err);
+          }
+          $scope.logger('success', "Navigation bearbeitet!", result.title);
+        };
+      }
+
+      if(angular.isUndefined($scope.afterAdd)) {
+        $scope.afterAdd = function (err, result) {
+          if(err) {
+            return $scope.logger('error', "Navigation wurde nicht hinzugefügt!", err);
+          }
+          $scope.logger('success', "Navigation hinzugefügt!", result.title);
+        };
+      }
+
+      $scope.add = function() {
+        if(!$scope.authenticated) {
+          return false;
+        }
+        SubnavigationService.add($scope.navs, {page:page}, $scope.afterAdd);
+      };
+      $scope.addNav = $scope.add; // alias
+
+      $scope.moveForward = function(index, nav) {
+        SortableService.moveForward(index, $scope.navs, function(err, navs) {
+          if(err) {
+            $log.error("Error: On move subnavigation forward!", err);
+            return err;
+          }
+          $scope.navs = navs;
+        });
+      };
+      $scope.moveForwardNav = $scope.moveForward; // alias
+
+      $scope.moveBackward = function(index, nav) {
+        SortableService.moveBackward(index, $scope.navs, function(err, navs) {
+          if(err) {
+            $log.error("Error: On move content backward!", err);
+            return err;
+          }
+          $scope.navs = navs;
+        });
+      };
+      $scope.moveBackwardNav = $scope.moveBackward; // alias
+
+      $scope.edit = function(navs) {
+        if(!$scope.authenticated) {
+          return false;
+        }
+        SubnavigationService.edit(navs, $scope.afterEdit);
+      };
+      $scope.editNavs = $scope.edit; // alias
+
+      $scope.remove = function(index, nav) {
+        if(!$scope.authenticated) {
+          return false;
+        }
+        SubnavigationService.remove($scope.navs, index, nav, page, $scope.afterRemove);
+      };
+      $scope.removeNav = remove; // alias
+
+      $scope.save = function () {
+        SubnavigationService.save($scope.navs, page, $scope.afterSave);
+      };
+
+
+      // TODO move to own drag and drops sortable navigation directive 
+      $scope.onDragOnComplete = function(index, nav, evt) {
+        if(nav === null) {
+          $log.debug("*click*", index);
+        }
+        $log.debug("onDragOnComplete, nav:", nav, "index", index);
+      };
+      $scope.onDragOnNavComplete = $scope.onDragOnComplete; // alias
+
+      $scope.onDropOnComplete = function(dropnavindex, dragnav, event) {
+        SortableService.dropMove($scope.navs, dropnavindex, dragnav, event, function(err, navs) {
+          $scope.navs = navs;
+        });
+      };
+      $scope.onDropOnNavComplete = $scope.onDropOnComplete; // alias
+
+      $scope.onDropOnAreaComplete = function(nav, evt) {
+        var index = $scope.navs.indexOf(nav);
+      };
+
+    }
+  };
 });
 angular.module('jumplink.cms.theme', [
   'sails.io',
@@ -3721,7 +4112,8 @@ angular.module('jumplink.cms.toolbar', [
       shorttitle: "=",
       fluid: "=",
       position: "=",
-      filter: "=", 
+      filter: "=",
+      subnavigation: "=?",
     },
     link: function ($scope, $element, $attrs) {
 
@@ -3901,6 +4293,21 @@ angular.module('jumplink.cms.utilities', [
     };
 
     /**
+     * @see: http://stackoverflow.com/questions/3068534/getting-javascript-object-key-list
+     */
+    var getKeys = function (obj) {
+      var keys = [];
+      if(!angular.isObject(obj)) {
+        console.error("[UtilityService.getKeys] is not an Object", obj);
+        return keys;
+      }
+      for(var k in obj) {
+        keys.push(k);
+      }
+      return keys;
+    };
+
+    /**
      * Capitalize the first character of a string, but not change the case of any of the other letters.
      *
      * @see http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript
@@ -3916,6 +4323,7 @@ angular.module('jumplink.cms.utilities', [
     return {
       invertOrder: invertOrder,
       findKeyValue: findKeyValue,
+      getKeys: getKeys,
       capitalizeFirstLetter: capitalizeFirstLetter,
       lowercaseFirstLetter: lowercaseFirstLetter,
     };
@@ -4058,6 +4466,7 @@ jumplink.cms = angular.module('jumplink.cms', [
   'jumplink.cms.sidebar',
   'jumplink.cms.toolbar',
   'jumplink.cms.signin',
+  'ngDownload',
 ]);
 
 jumplink.cms.run(function ($rootScope, $state, $window, $log) {
@@ -4253,7 +4662,37 @@ jumplink.cms.config( function(jlRoutesProvider) {
     },
     views: {
       'content' : {
-        templateUrl: '/views/modern/status/content.jade',
+        templateUrl: '/views/modern/status/status.jade',
+        controller: 'StatusController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
+        controller: 'ToolbarController'
+      },
+      'footer' : {
+        templateUrl: '/views/modern/footer.jade',
+        controller: 'FooterController'
+      }
+    },
+  };
+
+  routeOptions.layoutContent = {
+    resolve: {
+      authenticated: function (SessionService) {
+        return SessionService.needToBeAuthenticated();
+      },
+      contents: function(CmsService, $log) {
+        return ContentService.findAll(null, null);
+      },
+    },
+    views: {
+      'content' : {
+        templateUrl: '/views/modern/content/content.jade',
         controller: 'StatusController'
       },
       'toolbar' : {
@@ -4537,7 +4976,7 @@ jumplink.cms.controller('LayoutController', function($rootScope, sites, hosts) {
   $rootScope.hosts = hosts;
   $rootScope.selectedHost = hosts[0];
 });
-jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, RoutesService, UtilityService, HistoryService) {
+jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, $download, RoutesService, UtilityService, HistoryService, SortableService) {
   if(angular.isUndefined($scope.routes)) {
     $scope.routes = [];
   }
@@ -4553,7 +4992,7 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
           $scope.routes = [];
         }
         else {
-          $scope.routes = routes;
+          $scope.routes = SortableService.sort(routes);
         }
         // $log.debug("[RoutesController] new routes",routes);
       });
@@ -4616,6 +5055,15 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, R
         return err;
       }
       $log.debug("[RoutesController.add] Add routes done!", routes);
+    });
+  };
+
+  /**
+   * Export routes and download
+   */
+  $scope.download = function() {
+    RoutesService.exportByHost($rootScope.selectedHost, true, function(err, results) {
+
     });
   };
 

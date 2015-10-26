@@ -177,7 +177,37 @@ jumplink.cms.config( function(jlRoutesProvider) {
     },
     views: {
       'content' : {
-        templateUrl: '/views/modern/status/content.jade',
+        templateUrl: '/views/modern/status/status.jade',
+        controller: 'StatusController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
+        controller: 'ToolbarController'
+      },
+      'footer' : {
+        templateUrl: '/views/modern/footer.jade',
+        controller: 'FooterController'
+      }
+    },
+  };
+
+  routeOptions.layoutContent = {
+    resolve: {
+      authenticated: function (SessionService) {
+        return SessionService.needToBeAuthenticated();
+      },
+      contents: function(CmsService, $log) {
+        return ContentService.findAll(null, null);
+      },
+    },
+    views: {
+      'content' : {
+        templateUrl: '/views/modern/content/content.jade',
         controller: 'StatusController'
       },
       'toolbar' : {
