@@ -112,7 +112,7 @@ module.exports = function(grunt) {
     'assets/js/controllers/*.js',
     'assets/js/directives/*.js',
     'assets/js/modules/*.js',
-  ]
+  ];
 
   
   grunt.initConfig({

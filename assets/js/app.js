@@ -22,6 +22,8 @@ jumplink.cms = angular.module('jumplink.cms', [
   'ngFocus',
   'jumplink.cms.history',
   'jumplink.cms.content',
+  'jumplink.cms.content.medium',
+  'jumplink.cms.bootstrap.content',
   'jumplink.cms.sortable',
   'jumplink.cms.utilities',
   'jumplink.cms.subnavigation',

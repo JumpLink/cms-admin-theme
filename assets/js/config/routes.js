@@ -64,6 +64,11 @@ jumplink.cms.config( function(jlRoutesProvider) {
   };
 
   routeOptions.layoutRoutes = {
+    resolve: {
+      authenticated: function (SessionService) {
+        return SessionService.needToBeAuthenticated();
+      },
+    },
     views: {
       'content' : {
         templateUrl: '/views/modern/routes/routes.jade',
@@ -79,6 +84,33 @@ jumplink.cms.config( function(jlRoutesProvider) {
         controller: 'ToolbarController'
       },
     }
+  };
+
+  routeOptions.layoutContent = {
+    resolve: {
+      authenticated: function (SessionService) {
+        return SessionService.needToBeAuthenticated();
+      },
+    },
+    views: {
+      'content' : {
+        templateUrl: '/views/modern/content/content.jade',
+        controller: 'ContentController'
+      },
+      'toolbar' : {
+        resolve: {
+          routes: function(RoutesService) {
+            return RoutesService.find({});
+          },
+        },
+        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
+        controller: 'ToolbarController'
+      },
+      'footer' : {
+        templateUrl: '/views/modern/footer.jade',
+        controller: 'FooterController'
+      }
+    },
   };
 
   routeOptions.layoutUsers = {
@@ -178,36 +210,6 @@ jumplink.cms.config( function(jlRoutesProvider) {
     views: {
       'content' : {
         templateUrl: '/views/modern/status/status.jade',
-        controller: 'StatusController'
-      },
-      'toolbar' : {
-        resolve: {
-          routes: function(RoutesService) {
-            return RoutesService.find({});
-          },
-        },
-        template: '<jl-toolbar routes="routes", title="title", shorttitle="shorttitle", position="position", fluid="fluid", name="name"></jl-toolbar>',
-        controller: 'ToolbarController'
-      },
-      'footer' : {
-        templateUrl: '/views/modern/footer.jade',
-        controller: 'FooterController'
-      }
-    },
-  };
-
-  routeOptions.layoutContent = {
-    resolve: {
-      authenticated: function (SessionService) {
-        return SessionService.needToBeAuthenticated();
-      },
-      contents: function(CmsService, $log) {
-        return ContentService.findAll(null, null);
-      },
-    },
-    views: {
-      'content' : {
-        templateUrl: '/views/modern/content/content.jade',
         controller: 'StatusController'
       },
       'toolbar' : {
