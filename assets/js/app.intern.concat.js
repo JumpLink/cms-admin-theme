@@ -8,6 +8,7 @@ angular.module('jumplink.cms.admin', [
       restrict: 'E',
       templateUrl: '/views/modern/adminbar.jade',
       scope: {
+        upload : "=?",
         download : "=?",
         toogleHtml: "=?",
         refresh: "=?",
@@ -262,7 +263,7 @@ angular.module('jumplink.cms.bootstrap.blog', [
 
   var getModals = function() {
     return {
-      editModal: getTypeModal(),
+      editModal: getEditModal(),
       typeModal: getTypeModal()
     };
   };
@@ -2501,6 +2502,161 @@ angular.module('jumplink.cms.history', [
   HistoryService.push($state.current, $state.params);
 
 });
+angular.module('jumplink.cms.bootstrap.importexport', [
+  'jumplink.cms.importexport',
+  'jumplink.cms.bootstrap.uploader',
+  'mgcrea.ngStrap',
+  'ngFocus',
+])
+
+.service('ImportExportBootstrapService', function ($log, focus, $modal, FileUploader) {
+
+  var uploadModal = null;
+  
+
+  /**
+   * Setup the upload modal
+   */
+  var setModals = function($scope, fileOptions, onCompleteItemCallback, onImportStart, onAbort, onImportFinsih) {
+
+    uploadModal = $modal({title: 'JSON importieren', templateUrl: '/views/modern/uploadmodal.bootstrap.jade', show: false});
+    uploadModal.$scope.fileOptions = fileOptions;
+    uploadModal.$scope.imports = [];
+
+    uploadModal.$scope.ok = false;
+    uploadModal.$scope.import = function (hide) {
+      uploadModal.$scope.ok = true;
+
+      if(angular.isFunction(onImportStart)) {
+        onImportStart(uploadModal.$scope.imports, function (err, results) {
+          if(angular.isFunction(onImportFinsih)) {
+            onImportFinsih(err, results);
+          }
+          uploadModal.$scope.imports = [];
+          hide();
+        });
+      } else {
+        $log.warn("[ImportExportBootstrapService.abort] onImportStart is not defined!");
+        uploadModal.$scope.imports = [];
+        hide();
+      }
+
+    };
+    uploadModal.$scope.abort = function (hide) {
+      uploadModal.$scope.ok = false;
+      uploadModal.$scope.imports = [];
+
+      if(angular.isFunction(onAbort)) {
+        onAbort(uploadModal.$scope.imports, function (err) {
+          hide();
+        });
+      } else {
+        $log.warn("[ImportExportBootstrapService.abort] onAbort is not defined!");
+        hide();
+      }
+
+    };
+
+    // set default fileOptions
+    if(angular.isUndefined(uploadModal.$scope.fileOptions)) {
+      uploadModal.$scope.fileOptions = {};
+    }
+
+    uploadModal.$scope.uploadOptions = {
+      url: 'importexport/upload',
+      removeAfterUpload: true,
+      alias: 'import',
+
+      // WARN: headers HTML5 only
+      headers: {
+        options: JSON.stringify(uploadModal.$scope.fileOptions)
+      }
+    };
+
+    uploadModal.$scope.onCompleteItem = function (err, files) {
+      $log.debug("[ImportExportBootstrapService.onCompleteItem]");
+      if(angular.isFunction(onCompleteItemCallback)) {
+        onCompleteItemCallback(err, files);
+      }
+    };
+    uploadModal.$scope.onCompleteAll = function (err, result) {
+      $log.debug("[ImportExportBootstrapService.onCompleteAll]");
+    };
+
+    // uploadModal.$scope.uploader = new FileUploader($scope.uploadOptions);
+
+
+    uploadModal.$scope.upload = function(fileItem) {
+      fileItem.upload();
+    };
+
+    uploadModal.$scope.$on('modal.hide.before',function(modalEvent, uploadModal) {
+      $log.debug("edit closed", uploadModal.$scope, uploadModal);
+      if(uploadModal.$scope.ok) {
+
+        uploadModal.$scope.callback(null, uploadModal.$scope);
+      } else {
+        if(uploadModal.$scope.callback) {
+          uploadModal.$scope.callback("discarded", uploadModal.$scope);
+        }
+      }
+    });
+
+    return getModals();
+  };
+
+  var getUploadModal = function() {
+    return uploadModal;
+  };
+
+  var getModals = function() {
+    return {
+      uploadModal: getUploadModal(),
+    };
+  };
+
+  /**
+   * Show the upload modal to upload files
+   */
+  var show = function(callback) {
+    $log.debug("[BlogService.show]");
+    uploadModal.$scope.callback = callback;
+    uploadModal.$scope.ok = false;
+    focus('blogposttitle');
+    //- Show when some blogPost occurs (use $promise property to ensure the template has been loaded)
+    uploadModal.$promise.then(uploadModal.show);
+  };
+
+  var setImports = function (data, options) {
+    uploadModal.$scope.imports = uploadModal.$scope.imports.concat(data);
+    for (var i = uploadModal.$scope.imports.length - 1; i >= 0; i--) {
+      uploadModal.$scope.imports[i].importOptions = {
+        doImport: true,
+        identifier: uploadModal.$scope.imports[i][options.identifierKey],
+        description: uploadModal.$scope.imports[i][options.descriptionKey],
+      };
+    }  
+  };
+
+  return {
+    show: show,
+    setModals: setModals,
+    setImports: setImports,
+  };
+});
+angular.module('jumplink.cms.importexport', [
+  'jumplink.cms.attachment',
+  'ngAsync',
+  'sails.io',
+])
+
+.service('ImportExportService', function ($sailsSocket, $async, $log, $filter) {
+
+
+  return {
+
+  };
+});
 angular.module('jumplink.cms.info', [
   'sails.io',
 ])
@@ -2606,6 +2762,62 @@ angular.module('jumplink.cms.multisite', [
     resolveNames: resolveNames,
     resolveHosts: resolveHosts
   };
+});
+angular.module('jumplink.cms.bootstrap.routes', [
+  'jumplink.cms.routes',
+  'jumplink.cms.bootstrap.importexport',
+])
+.service('RoutesBootstrapService', function ($log, $async, ImportExportBootstrapService, UtilityService, RoutesService, SortableService) {
+  var modals = null;
+  var host = null;
+
+  var setHost = function (newHost) {
+    host = newHost;
+  };
+
+  var setupImportModal = function ($scope, onImportFinsih) {
+    var fileOptions = {};
+
+    var onCompleteFile = function (err, files) {
+      $log.debug("[RoutesBootstrapService.onCompleteFile]", files);
+      var data = [];
+      for (var i = 0; i < files.length; i++) {
+        data = data.concat(files[i].data);
+      }
+      ImportExportBootstrapService.setImports(data, {identifierKey: 'objectName', descriptionKey: 'title'});
+    };
+
+    var onImportStart = function (imports, next) {
+      $log.debug("[RoutesBootstrapService.onImportStart]", host);
+      $async.map(imports, function (item, callback) {
+        if(item.importOptions.doImport === true) {
+          RoutesService.updateOrCreateByHostByObjectNameAndNavbar(host, item, callback);
+        } else {
+          callback();
+        }
+        
+      }, function(err, results) {
+        $log.debug("[RoutesBootstrapService.onImportStart] done", err, results);
+        results = SortableService.sort(results);
+        next(err, results);
+      });
+      
+    };
+
+    var onAbort = function (imports, next) {
+      $log.debug("[RoutesBootstrapService.onAbort]");
+      next();
+    };
+
+    modals = ImportExportBootstrapService.setModals($scope, fileOptions, onCompleteFile, onImportStart, onAbort, onImportFinsih);
+  };
+
+  return {
+    setHost: setHost,
+    setupImportModal: setupImportModal,
+    showImportModal: ImportExportBootstrapService.show,
+  };
+
 });
 angular.module('jumplink.cms.routes', [
   'ui.router',                 // AngularUI Router: https://github.com/angular-ui/ui-router
@@ -2873,6 +3085,9 @@ angular.module('jumplink.cms.routes', [
     });
   };
 
+  /**
+   * Update or create route (eg. position) for current host.
+   */
   var updateOrCreate = function(route, callback) {
     $log.debug("[RoutesService.updateOrCreate]", route);
     var options = {
@@ -2882,6 +3097,27 @@ angular.module('jumplink.cms.routes', [
     return JLSailsService.resolve('/Routes/updateOrCreate', {route: route}, options, callback);
   };
 
+  /**
+   * Update or create route for any passed host.
+   * Only for superadmins!
+   *
+   * @param req.param.host Host to save route for
+   */
+  var updateOrCreateByHostByObjectNameAndNavbar = function(host, route, callback) {
+    $log.debug("[RoutesService.updateOrCreateByHostByObjectNameAndNavbar]", host, route);
+    var options = {
+      method: 'post',
+      resultIsArray: false
+    };
+    return JLSailsService.resolve('/Routes/updateOrCreateByHostByObjectNameAndNavbar', {host: host, route: route}, options, callback);
+  };
+
+  /**
+   * Update or create route (eg. position) for any passed host.
+   * Only for superadmins!
+   *
+   * @param req.param.host Host to save route for
+   */
   var updateOrCreateByHost = function(host, route, callback) {
     $log.debug("[RoutesService.updateOrCreateByHost]", host, route);
     var options = {
@@ -2891,6 +3127,9 @@ angular.module('jumplink.cms.routes', [
     return JLSailsService.resolve('/Routes/updateOrCreateByHost', {host: host, route: route}, options, callback);
   };
 
+  /**
+   * Update or create each route (eg. position) for current host.
+   */
   var updateOrCreateEach = function(routes, callback) {
     $log.debug("[RoutesService.updateOrCreateEach]", routes);
     var options = {
@@ -2900,6 +3139,12 @@ angular.module('jumplink.cms.routes', [
     return JLSailsService.resolve('/Routes/updateOrCreateEach', {routes: routes}, options, callback);
   };
 
+  /**
+   * Update or create each route (eg. position) for any passed host.
+   * Only for superadmins!
+   *
+   * @param req.param.host Host to save route for
+   */
   var updateOrCreateEachByHost = function(host, routes, callback) {
     $log.debug("[RoutesService.updateOrCreateEachByHost]", host, routes);
     var options = {
@@ -2945,6 +3190,7 @@ angular.module('jumplink.cms.routes', [
     findByHost: findByHost,
     exportByHost: exportByHost,
     updateOrCreate: updateOrCreate,
+    updateOrCreateByHostByObjectNameAndNavbar: updateOrCreateByHostByObjectNameAndNavbar,
     updateOrCreateByHost: updateOrCreateByHost,
     updateOrCreateEach: updateOrCreateEach,
     updateOrCreateEachByHost: updateOrCreateEachByHost,
@@ -4137,6 +4383,65 @@ angular.module('jumplink.cms.toolbar', [
     }
   };
 });
+angular.module('jumplink.cms.bootstrap.uploader', [
+  'angularFileUpload',
+])
+.directive('jlUploader', function () {
+
+  return {
+    restrict: 'E',
+    templateUrl: '/views/modern/uploader.bootstrap.jade',
+    scope: {
+      label : "@",
+      labelFiles : "@",
+      uploadOptions: "=",
+      fileOptions: "=",
+      onCompleteAll: "=",
+      onCompleteItem: "=",
+    },
+    link: function ($scope, $element, $attrs) {
+    },
+    controller: function ($rootScope, $scope, $log, FileUploader) {
+      $scope.files = [];
+      if(angular.isUndefined($scope.fileOptions)) {
+        $scope.fileOptions = {};
+      }
+      $scope.uploader = new FileUploader($scope.uploadOptions);
+      $log.debug("[jlUploader] uploadOptions", $scope.uploadOptions);
+      $log.debug("[jlUploader] uploader", $scope.uploader);
+      $log.debug("[jlUploader] onCompleteAll", $scope.onCompleteAll);
+      $log.debug("[jlUploader] onCompleteItem", $scope.onCompleteItem);
+
+      $scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
+        $log.debug("[jlUploader.onCompleteItem] status", status);
+        for (var i = 0; i < response.files.length; i++) {
+          $log.debug("[jlUploader.onCompleteItem] response.files[i]", response.files[i]);
+        }
+        $scope.files = $scope.files.concat(response.files);
+        if(angular.isFunction($scope.onCompleteItem)) {
+          $scope.onCompleteItem(null, $scope.files); // TODO detect error
+        }
+      };
+      
+      $scope.uploader.onCompleteAll = function() {
+        $log.debug("[jlUploader.onCompleteAll]");
+        if(angular.isFunction($scope.onCompleteAll)) {
+          $scope.onCompleteAll(null, $scope.files);
+        }
+      };
+
+      $scope.upload = function(fileItem) {
+        fileItem.upload();
+      };
+
+      $scope.uploader.onProgressItem = function(fileItem, progress) {
+        $log.debug('[jlUploader.onProgressItem]', fileItem, progress);
+      };
+      
+
+    }
+  };
+});
 angular.module('jumplink.cms.user', [
     'sails.io',
     'jumplink.cms.sails',
@@ -4463,6 +4768,7 @@ jumplink.cms = angular.module('jumplink.cms', [
   'jumplink.cms.session',
   'jumplink.cms.multisite',
   'jumplink.cms.routes',
+  'jumplink.cms.bootstrap.routes',
   'jumplink.cms.sidebar',
   'jumplink.cms.toolbar',
   'jumplink.cms.signin',
@@ -4976,17 +5282,48 @@ jumplink.cms.controller('LayoutController', function($rootScope, sites, hosts) {
   $rootScope.hosts = hosts;
   $rootScope.selectedHost = hosts[0];
 });
-jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, $download, RoutesService, UtilityService, HistoryService, SortableService) {
+jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, $download, RoutesService, RoutesBootstrapService, UtilityService, HistoryService, SortableService) {
   if(angular.isUndefined($scope.routes)) {
     $scope.routes = [];
   }
   $scope.showMainRoutes = false;
-
   $scope.goToHashPosition = HistoryService.goToHashPosition;
+
+  // ================ START: import export stuff ================
+  var onImportFinsih = function (err, routes) {
+    if(err) {
+      $log.error("[RoutesController.onImportFinsih]", err);
+      return err;
+    }
+    $log.debug("[RoutesController.onImportFinsih]", routes);
+    $scope.routes = routes;
+  };
+
+  RoutesBootstrapService.setupImportModal($scope, onImportFinsih);
+  RoutesBootstrapService.setHost($rootScope.selectedHost);
+
+  /**
+   * Export routes and download them
+   */
+  $scope.download = function() {
+    RoutesService.exportByHost($rootScope.selectedHost, true, function(err, results) {
+
+    });
+  };
+
+  /**
+   * Upload routes and import them
+   */
+  $scope.upload = function() {
+    RoutesBootstrapService.showImportModal(function(err, result) {
+      $log.debug("RoutesController.upload", err, result);
+    });
+  };
 
   $rootScope.$watch('selectedHost', function(newValue, oldValue) {
     // $log.debug("[RoutesController] selectedHost changed from",oldValue,"to",newValue);
     if(angular.isDefined(newValue)) {
+      RoutesBootstrapService.setHost(newValue);
       RoutesService.findByHost({host:newValue}, function(err, routes) {
         if(err) {
           $scope.routes = [];
@@ -4998,6 +5335,8 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, $
       });
     }
   });
+
+  // ================ END: import export stuff ================
 
   var appendToStatename = function (statename, toAppend) {
     $log.debug("[RoutesController.appendToStatename]", statename, toAppend);
@@ -5055,15 +5394,6 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, $
         return err;
       }
       $log.debug("[RoutesController.add] Add routes done!", routes);
-    });
-  };
-
-  /**
-   * Export routes and download
-   */
-  $scope.download = function() {
-    RoutesService.exportByHost($rootScope.selectedHost, true, function(err, results) {
-
     });
   };
 

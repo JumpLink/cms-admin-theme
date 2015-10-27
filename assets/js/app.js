@@ -35,6 +35,7 @@ jumplink.cms = angular.module('jumplink.cms', [
   'jumplink.cms.session',
   'jumplink.cms.multisite',
   'jumplink.cms.routes',
+  'jumplink.cms.bootstrap.routes',
   'jumplink.cms.sidebar',
   'jumplink.cms.toolbar',
   'jumplink.cms.signin',

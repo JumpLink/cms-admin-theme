@@ -1,14 +1,45 @@
-jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, $download, RoutesService, UtilityService, HistoryService, SortableService) {
+jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, $download, RoutesService, RoutesBootstrapService, UtilityService, HistoryService, SortableService) {
   if(angular.isUndefined($scope.routes)) {
     $scope.routes = [];
   }
   $scope.showMainRoutes = false;
-
   $scope.goToHashPosition = HistoryService.goToHashPosition;
+
+  // ================ START: import export stuff ================
+  var onImportFinsih = function (err, routes) {
+    if(err) {
+      $log.error("[RoutesController.onImportFinsih]", err);
+      return err;
+    }
+    $log.debug("[RoutesController.onImportFinsih]", routes);
+    $scope.routes = routes;
+  };
+
+  RoutesBootstrapService.setupImportModal($scope, onImportFinsih);
+  RoutesBootstrapService.setHost($rootScope.selectedHost);
+
+  /**
+   * Export routes and download them
+   */
+  $scope.download = function() {
+    RoutesService.exportByHost($rootScope.selectedHost, true, function(err, results) {
+
+    });
+  };
+
+  /**
+   * Upload routes and import them
+   */
+  $scope.upload = function() {
+    RoutesBootstrapService.showImportModal(function(err, result) {
+      $log.debug("RoutesController.upload", err, result);
+    });
+  };
 
   $rootScope.$watch('selectedHost', function(newValue, oldValue) {
     // $log.debug("[RoutesController] selectedHost changed from",oldValue,"to",newValue);
     if(angular.isDefined(newValue)) {
+      RoutesBootstrapService.setHost(newValue);
       RoutesService.findByHost({host:newValue}, function(err, routes) {
         if(err) {
           $scope.routes = [];
@@ -20,6 +51,8 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, $
       });
     }
   });
+
+  // ================ END: import export stuff ================
 
   var appendToStatename = function (statename, toAppend) {
     $log.debug("[RoutesController.appendToStatename]", statename, toAppend);
@@ -77,15 +110,6 @@ jumplink.cms.controller('RoutesController', function($rootScope, $scope, $log, $
         return err;
       }
       $log.debug("[RoutesController.add] Add routes done!", routes);
-    });
-  };
-
-  /**
-   * Export routes and download them
-   */
-  $scope.download = function() {
-    RoutesService.exportByHost($rootScope.selectedHost, true, function(err, results) {
-
     });
   };
 
