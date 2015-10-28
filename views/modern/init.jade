@@ -1,5 +1,5 @@
 doctype html
-html(lang="en", ng-app="jumplink.cms", ng-controller="AppController")
+html(lang="en", ng-app="jumplink.cms", ng-strict-di, ng-controller="AppController")
   head
     base(href="/")
     title Administration
@@ -38,8 +38,6 @@ html(lang="en", ng-app="jumplink.cms", ng-controller="AppController")
           a.btn.btn-primary.btn-lg(href="https://"+url+"?force=noscript") Kompatiblitätsmodus aktivieren
     span(ui-view)
     // SCRIPTS
-    if config.environment == 'development'
-      script(type="text/javascript", charset="utf-8", src="assets/js/app.concat.js")
-    else
-      script(type="text/javascript", charset="utf-8", src="assets/js/app.min.js")
+    script(type="text/javascript", charset="utf-8", src="assets/js/libs.js")
+    script(type="text/javascript", charset="utf-8", src="assets/js/app.js")
     // SCRIPTS END
