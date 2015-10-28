@@ -100,6 +100,7 @@ module.exports = function(grunt) {
     'assets/third-party/angular-validation/dist/angular-validation.js',
     'assets/third-party/angular-validation/dist/angular-validation-rule.js',
 
+    // https://github.com/rndme/download
     'assets/third-party/download/download.js',
   ];
 
