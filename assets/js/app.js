@@ -43,9 +43,3 @@ jumplink.cms = angular.module('jumplink.cms', [
   'jumplink.cms.signin',
   'ngDownload',
 ]);
-
-jumplink.cms.run(function ($rootScope, $state, $window, $log) {
-  $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
-    $state.go('error.signin', {error: error});
-  });
-});

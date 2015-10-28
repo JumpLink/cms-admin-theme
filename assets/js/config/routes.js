@@ -263,6 +263,7 @@ jumplink.cms.config( function(jlRoutesProvider) {
 
 jumplink.cms.run(function ($rootScope, $state, $window, $log) {
   $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
+    $log.error("[config/routes.js] Error", error);
     $state.go('error.signin', {error: error});
   });
 });
