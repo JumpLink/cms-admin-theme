@@ -43,7 +43,7 @@
     "bootstrap-additions": "JumpLink/bootstrap-additions#master",
     "font-awesome": "~4.4.0",
     "js-beautify": "~1.5.5",
-    "jumplink-cms-angular": "JumpLink/cms-angular#master",
+    "jumplink-cms-angular": "JumpLink/cms-angular#0.0.3",
     "Leaflet.label": "~0.2.1",
     "ng-filters": "~1.2.0",
     "ngDraggable": "~0.1.8",

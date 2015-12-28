@@ -20,98 +20,158 @@
       }
     ],
     "routes": [
-      {
-        "position": 1,
-        "match": "/*home*",
-        "title": "Home",
-        "state": {
-          "name": "layout.home",
-          "customstate": false,
-          "url": "",
-          "views": "",
-          "resolve": "",
-          "parent": "Layout"
+      {  
+        "position":1,
+        "match":"/*home*",
+        "title":"Home",
+        "state":{  
+           "name":"layout.home",
+           "customstate":false,
+           "url":"",
+           "views":"",
+           "resolve":"",
+           "parent":"layout"
         },
-        "fallback": {
-          "url": ""
+        "fallback":{  
+           "url":""
         },
-        "site": "admin",
-        "main": true,
-        "key": "home",
-        "objectName": "layoutHome",
-        "sitetitle": "JumpLink CMS Administration - Home",
-        "url": "/home",
-        "navbar": "header"
+        "main":true,
+        "key":"home",
+        "objectName":"layoutHome",
+        "sitetitle":"JumpLink CMS Administration - Home",
+        "url":"/home",
+        "navbar":"header",
+        "createdAt":"2015-08-10T14:25:28.874Z",
+        "updatedAt":"2015-10-28T14:00:57.726Z"
       },
-      {
-        "position": 2,
-        "match": "/*themes*",
-        "title": "Themes",
-        "state": {
-          "name": "layout.themes",
-          "customstate": false,
-          "url": "",
-          "views": "",
-          "resolve": "",
-          "parent": "Layout"
+      {  
+        "position":2,
+        "match":"/*themes*",
+        "title":"Themes",
+        "state":{  
+           "name":"layout.themes",
+           "customstate":false,
+           "url":"",
+           "views":"",
+           "resolve":"",
+           "parent":"layout"
         },
-        "fallback": {
-          "url": ""
+        "fallback":{  
+           "url":""
         },
-        "site": "admin",
-        "main": true,
-        "key": "themes",
-        "objectName": "layoutThemes",
-        "navbar": "header",
-        "sitetitle": "JumpLink CMS Administration - Themes",
-        "url": "/themes"
+        "main":true,
+        "key":"themes",
+        "objectName":"layoutThemes",
+        "navbar":"header",
+        "sitetitle":"JumpLink CMS Administration - Themes",
+        "url":"/themes",
+        "createdAt":"2015-08-10T14:25:28.880Z",
+        "updatedAt":"2015-10-28T14:00:57.794Z"
       },
-      {
-        "position": 3,
-        "match": "/*routes*",
-        "title": "Routes",
-        "state": {
-          "name": "layout.routes",
-          "customstate": false,
-          "url": "",
-          "views": "",
-          "resolve": "",
-          "parent": "Layout"
+      {  
+        "position":3,
+        "match":"/*routes*",
+        "title":"Routes",
+        "state":{  
+           "name":"layout.routes",
+           "customstate":false,
+           "url":"",
+           "views":"",
+           "resolve":"",
+           "parent":"layout"
         },
-        "fallback": {
-          "url": ""
+        "fallback":{  
+           "url":""
         },
-        "site": "admin",
-        "main": true,
-        "key": "routes",
-        "objectName": "layoutRoutes",
-        "sitetitle": "JumpLink CMS Administration - Routes",
-        "navbar": "header",
-        "url": "/routes"
+        "main":true,
+        "key":"routes",
+        "objectName":"layoutRoutes",
+        "sitetitle":"JumpLink CMS Administration - Routes",
+        "navbar":"header",
+        "url":"/routes",
+        "createdAt":"2015-08-10T14:25:28.884Z",
+        "updatedAt":"2015-10-28T14:00:57.854Z"
       },
-      {
-        "position": 4,
-        "match": "",
-        "title": "Users",
-        "main": true,
-        "state": {
-          "name": "layout.users",
-          "customstate": false,
-          "url": "",
-          "views": "",
-          "resolve": "",
-          "parent": "layout"
+      {  
+        "position":4,
+        "match":"",
+        "title":"Users",
+        "main":true,
+        "state":{  
+           "name":"layout.users",
+           "customstate":false,
+           "url":"",
+           "views":"",
+           "resolve":"",
+           "parent":"layout"
         },
-        "url": "/users",
-        "alternativeUrls": [],
-        "fallback": {
-          "url": ""
+        "url":"/users",
+        "alternativeUrls":[  
+
+        ],
+        "fallback":{  
+           "url":""
         },
-        "objectName": "layoutUsers",
-        "key": "users",
-        "sitetitle": "JumpLink CMS Administration - Users",
-        "navbar": "header",
-        "site": "admin"
+        "objectName":"layoutUsers",
+        "key":"users",
+        "sitetitle":"JumpLink CMS Administration - Users",
+        "navbar":"header",
+        "createdAt":"2015-10-13T20:38:05.662Z",
+        "updatedAt":"2015-10-28T14:00:57.912Z"
+      },
+      {  
+        "position":5,
+        "main":true,
+        "match":"/*status*",
+        "title":"Status",
+        "url":"/status",
+        "alternativeUrls":[  
+
+        ],
+        "state":{  
+           "name":"layout.status",
+           "customstate":false,
+           "url":"",
+           "views":"",
+           "resolve":"",
+           "parent":"layout"
+        },
+        "fallback":{  
+           "url":""
+        },
+        "objectName":"layoutStatus",
+        "key":"status",
+        "sitetitle":"JumpLink CMS Administration - Status",
+        "navbar":"header",
+        "createdAt":"2015-10-21T13:34:38.725Z",
+        "updatedAt":"2015-10-26T17:26:45.883Z"
+      },
+      {  
+        "position":6,
+        "main":true,
+        "match":"/*content*",
+        "title":"Content",
+        "url":"/content",
+        "alternativeUrls":[  
+
+        ],
+        "state":{  
+           "name":"layout.content",
+           "customstate":false,
+           "url":"",
+           "views":"",
+           "resolve":"",
+           "parent":"layout"
+        },
+        "fallback":{  
+           "url":""
+        },
+        "objectName":"layoutContent",
+        "sitetitle":"JumpLink CMS Administration - Content",
+        "key":"content",
+        "navbar":"header",
+        "createdAt":"2015-10-26T17:03:47.773Z",
+        "updatedAt":"2015-10-26T17:26:45.962Z"
       }
     ]
   }

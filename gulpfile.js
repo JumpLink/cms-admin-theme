@@ -112,6 +112,7 @@ var SOURCES = {
   TEMPLATES: './views/**/*.jade',
   APP: [
     './src/third-party/jumplink-cms-angular/src/*/*.js',
+    //'./src/third-party/jumplink-cms-angular/dist/jumplink-cms-angular-bootstrap.js',
     './src/js/app.js',
     './src/js/config/*.js',
     './src/js/services/*.js',
